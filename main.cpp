@@ -204,28 +204,9 @@ void draw_square(GLfloat x, GLfloat y, GLfloat a, GLfloat r, GLfloat g,
 int main() {
   double i = 0, j = 0, delta = 0.5;
   vector<vector<tuple<GLfloat, GLfloat, GLfloat>>> screen(
-      scr_size, vector<tuple<GLfloat, GLfloat, GLfloat>>(
-                    scr_size, make_tuple(0, 0, 0)));
-  // for (; delta > 0.1; delta /= 2) {
-  //   for (int t = 0; t < 4; t++) {
-  //     i = (t < 2) ? 0 : delta / 2;
-  //     j = (t % 2) ? 0 : delta / 2;
-  //     for (; i < 1; i += delta) {
-  //       for (; j < 1; j += delta) {
-  //         cout << i << ", " << j << endl;
-  //       }
-  //     }
-  //   }
-  // }
+      scr_size,
+      vector<tuple<GLfloat, GLfloat, GLfloat>>(scr_size, make_tuple(0, 0, 0)));
   int t = 0;
-  // while (delta > 0.25) {
-  //   auto T = get_next(i, j, delta, t);
-  //   i = get<0>(T);
-  //   j = get<1>(T);
-  //   delta = get<2>(T);
-  //   t = get<3>(T);
-  //   cout << i << ", " << j << ", " << delta << ", " << t << endl;
-  // }
   init();
   for (int i = 0; i < scr_size; i++)
     for (int j = 0; j < scr_size; j++) {
@@ -240,6 +221,25 @@ int main() {
     T = current_time;
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //    draw
+    cout << i << ", " << j << ", " << delta << ", " << t << endl;
+    {
+      auto T = get_next(i, j, delta, t);
+      i = get<0>(T);
+      j = get<1>(T);
+      delta = get<2>(T);
+      t = get<3>(T);
+    }
+    for (int x = 0; x < scr_size * delta / 2; x++) {
+      for (int y = 0; y < scr_size * delta / 2; y++) {
+        if (i * scr_size + x < scr_size && y + j * scr_size < scr_size) {
+          screen[i * scr_size + x][y + j * scr_size] = make_tuple(
+              1 - get<0>(screen[i * scr_size + x][y + j * scr_size]),
+              1 - get<1>(screen[i * scr_size + x][y + j * scr_size]),
+              1 - get<2>(screen[i * scr_size + x][y + j * scr_size]));
+        }
+      }
+    }
+
     for (int i = 0; i < scr_size; i++) {
       for (int j = 0; j < scr_size; j++) {
         draw_square(i * 2.0 / scr_size - 1, j * 2.0 / scr_size - 1,
@@ -249,14 +249,6 @@ int main() {
     }
     glfwSwapBuffers(window);
     glfwPollEvents();
-    // cout << i << ", " << j << ", " << delta << ", " << t << endl;
-    // {
-    //   auto T = get_next(i, j, delta, t);
-    //   i = get<0>(T);
-    //   j = get<1>(T);
-    //   delta = get<2>(T);
-    //   t = get<3>(T);
-    // }
   }
   glfwDestroyWindow(window);
   glfwTerminate();
