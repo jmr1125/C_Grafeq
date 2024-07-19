@@ -64,6 +64,7 @@ CMAKE_BINARY_DIR = /Users/jiang/desktop/C_GrafEq/build
 
 # The main recursive "all" target.
 all: CMakeFiles/C_GrafEQ.dir/all
+all: CMakeFiles/testeval.dir/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
@@ -72,6 +73,7 @@ preinstall:
 
 # The main recursive "clean" target.
 clean: CMakeFiles/C_GrafEQ.dir/clean
+clean: CMakeFiles/testeval.dir/clean
 .PHONY : clean
 
 #=============================================================================
@@ -81,12 +83,12 @@ clean: CMakeFiles/C_GrafEQ.dir/clean
 CMakeFiles/C_GrafEQ.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/C_GrafEQ.dir/build.make CMakeFiles/C_GrafEQ.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/C_GrafEQ.dir/build.make CMakeFiles/C_GrafEQ.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/jiang/desktop/C_GrafEq/build/CMakeFiles --progress-num=1,2 "Built target C_GrafEQ"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/jiang/desktop/C_GrafEq/build/CMakeFiles --progress-num=1,2,3 "Built target C_GrafEQ"
 .PHONY : CMakeFiles/C_GrafEQ.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/C_GrafEQ.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/jiang/desktop/C_GrafEq/build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/jiang/desktop/C_GrafEq/build/CMakeFiles 3
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/C_GrafEQ.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/jiang/desktop/C_GrafEq/build/CMakeFiles 0
 .PHONY : CMakeFiles/C_GrafEQ.dir/rule
@@ -99,6 +101,32 @@ C_GrafEQ: CMakeFiles/C_GrafEQ.dir/rule
 CMakeFiles/C_GrafEQ.dir/clean:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/C_GrafEQ.dir/build.make CMakeFiles/C_GrafEQ.dir/clean
 .PHONY : CMakeFiles/C_GrafEQ.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/testeval.dir
+
+# All Build rule for target.
+CMakeFiles/testeval.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/testeval.dir/build.make CMakeFiles/testeval.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/testeval.dir/build.make CMakeFiles/testeval.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/jiang/desktop/C_GrafEq/build/CMakeFiles --progress-num=4,5,6 "Built target testeval"
+.PHONY : CMakeFiles/testeval.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/testeval.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/jiang/desktop/C_GrafEq/build/CMakeFiles 3
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/testeval.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/jiang/desktop/C_GrafEq/build/CMakeFiles 0
+.PHONY : CMakeFiles/testeval.dir/rule
+
+# Convenience name for target.
+testeval: CMakeFiles/testeval.dir/rule
+.PHONY : testeval
+
+# clean rule for target.
+CMakeFiles/testeval.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/testeval.dir/build.make CMakeFiles/testeval.dir/clean
+.PHONY : CMakeFiles/testeval.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

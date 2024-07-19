@@ -1,7 +1,12 @@
 
+#include "eval.h"
 #include <GLFW/glfw3.h>
 #include <cstdlib>
 #include <iostream>
+#include <tuple>
+#include <vector>
+
+using namespace std;
 
 static const char *vertex_shader_code = R"(
 #version 110
@@ -43,7 +48,28 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action,
   if (action == GLFW_PRESS && key == GLFW_KEY_ESCAPE)
     glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
-
+tuple<double, double, double, int> get_next(double i, double j, double delta,
+                                            int t) {
+  double initI = (t < 2) ? 0 : delta / 2;
+  double initJ = (t % 2) ? 0 : delta / 2;
+  if (j + delta < 1) {
+    // cout << "a" << endl;
+    return make_tuple(i, j + delta, delta, t);
+  }
+  if (i + delta < 1) {
+    // cout << "b" << endl;
+    return make_tuple(i + delta, initJ, delta, t);
+  }
+  if (t < 4) {
+    // cout << "c" << endl;
+    return make_tuple(initI, initJ, delta, t + 1);
+  }
+  // cout << "d" << endl;
+  return make_tuple(0, 0, delta / 2, 0);
+}
+double i, j, delta = 0.5;
+int t;
+int scr_size = 512;
 int main() {
   if (!glfwInit()) {
     std::cerr << "Failed to initialize GLFW" << std::endl;
@@ -54,7 +80,8 @@ int main() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
-  GLFWwindow *window = glfwCreateWindow(512, 512, "grafeq", NULL, NULL);
+  GLFWwindow *window =
+      glfwCreateWindow(scr_size, scr_size, "grafeq", NULL, NULL);
   if (!window) {
     glfwTerminate();
     return -1;
@@ -112,12 +139,7 @@ int main() {
   glGenTextures(1, &texture);
   glBindTexture(GL_TEXTURE_2D, texture);
 
-  char image[16 * 16 * 3];
-
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, 16, 16, 0, GL_LUMINANCE,
-               GL_UNSIGNED_BYTE, image);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  vector<unsigned char> image(scr_size * scr_size * 3);
 
   glUseProgram(program);
   glUniform1i(textureLocation, 0);
@@ -131,17 +153,51 @@ int main() {
   glVertexAttribPointer(vTexCoordLocation, 2, GL_FLOAT, GL_FALSE,
                         4 * sizeof(GLfloat), (void *)(2 * sizeof(GLfloat)));
 
+  // auto expr = tokenize("xyav -0.5 a"); line
+  // auto expr = tokenize("x v -0.5 av 2 pys"); y=x^2
+  // auto expr = tokenize("x v -0.4 a v 2 p y v -0.5 av 2 p a v -0.14 a");
+  // circle
+  // auto expr = tokenize("v 1 x d v 1 y d a v 10 s");1/x+1/y=10
+  // auto expr = tokenize("x y a x y m v 10 m s"); x+y=10xy
+  //auto expr = tokenize("x v 10 m S v 1 a v 2.5 d y s"); // (sin 10x +1)/2.5 = y
+  auto expr = tokenize("y v 10 m S v 1 a v 2.5 d x s"); // (sin 10x +1)/2.5 = y
   while (!glfwWindowShouldClose(window)) {
     glBindTexture(GL_TEXTURE_2D, texture);
-    for (int x = 0; x < 16; ++x) {
-      for (int y = 0; y < 16; ++y) {
-        image[(x * 16 + y) * 3 + 0] = rand() % 256;
-        image[(x * 16 + y) * 3 + 1] = rand() % 256;
-        image[(x * 16 + y) * 3 + 2] = rand() % 256;
+    for (int C = 0; C < 1 / delta; ++C) {
+      if (delta >= 1.0 / scr_size) {
+        {
+          // int x = i * scr_size, y = j * scr_size;
+          // image[(x * scr_size + y) * 3 + 0] ^= 255;
+          // image[(x * scr_size + y) * 3 + 1] ^= 255;
+          // image[(x * scr_size + y) * 3 + 2] ^= 255;
+          int x = i * scr_size, y = j * scr_size;
+          char c = 0;
+          double v = eval(expr, i, j);
+          bool is = false;
+          if (abs(v) < delta) {
+            is = true;
+            cout << i << " " << j << " " << v << "; 1 / " << 1 / delta << " "
+                 << (int)c << endl;
+            // cout << " v" << endl;
+          } else {
+            // cout << " x" << endl;
+          }
+          image[(x * scr_size + y) * 3 + 0] ^= 255;
+          image[(x * scr_size + y) * 3 + 1] = is ? 255 : 0;
+          image[(x * scr_size + y) * 3 + 2] = is ? 255 : 0;
+          // image[(x * scr_size + y) * 3 + 1] = 127;
+          // image[(x * scr_size + y) * 3 + 2] = 255;
+        }
+        {
+          auto [I, J, D, T] = get_next(i, j, delta, t);
+          i = I, j = J, delta = D, t = T;
+        }
       }
     }
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 16, 16, 0, GL_RGB, GL_UNSIGNED_BYTE,
-                 image);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, scr_size, scr_size, 0, GL_RGB,
+                 GL_UNSIGNED_BYTE, image.data());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glClear(GL_COLOR_BUFFER_BIT);
 
     const GLfloat color[] = {1.0f, 1.0f, 1.0f};
