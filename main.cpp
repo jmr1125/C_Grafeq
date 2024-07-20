@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 #include <cstdlib>
 #include <iostream>
+#include <optional>
 #include <tuple>
 #include <vector>
 
@@ -156,22 +157,27 @@ int main() {
   string sexpr;
   getline(cin, sexpr);
   auto expr = tokenize(sexpr);
-  vector<vector<optional<double>>> cache(scr_size,
-                                         vector<optional<double>>(scr_size));
+  vector<vector<optional<double>>> cache(
+      scr_size * (1 + 0.5), vector<optional<double>>(scr_size * (1 + 0.5)));
   while (!glfwWindowShouldClose(window)) {
     glBindTexture(GL_TEXTURE_2D, texture);
     for (int C = 0; C < 1 / delta; ++C) {
       if (delta >= 1.0 / scr_size) {
         {
           int x = i * scr_size, y = j * scr_size;
-          char c = 0;
-          double v = cache[x][y].hasvalue() ? cache[x][y]
-                                            : (cache[x][y] = eval(expr, i, j));
+#define GET_CACHE(x, y, i, j)                                                  \
+  (cache[x][y].has_value() ? cache[x][y] : (cache[x][y] = eval(expr, i, j)))   \
+      .value()
+          double v0 = GET_CACHE(x, y, i, j);
+          double v1 = GET_CACHE(x + delta * scr_size, y, i + delta, j);
+          double v2 = GET_CACHE(x, y + delta * scr_size, i, j + delta);
+          double v3 = GET_CACHE(x + delta * scr_size, y + delta * scr_size,
+                                i + delta, j + delta);
           bool is = false;
-          if (abs(v) < delta) {
+          if ((v0 < 0 || v1 < 0 || v2 < 0 || v3 < 0) &&
+              (v0 > 0 || v1 > 0 || v2 > 0 || v3 > 0)) {
             is = true;
-            cout << i << " " << j << " " << v << "; 1 / " << 1 / delta << " "
-                 << (int)c << endl;
+            cout << i << " " << j << "; 1 / " << 1 / delta << endl;
           }
           image[(x * scr_size + y) * 3 + 0] ^= 255;
           image[(x * scr_size + y) * 3 + 1] = is ? 255 : 0;
