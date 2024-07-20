@@ -153,40 +153,29 @@ int main() {
   glVertexAttribPointer(vTexCoordLocation, 2, GL_FLOAT, GL_FALSE,
                         4 * sizeof(GLfloat), (void *)(2 * sizeof(GLfloat)));
 
-  // auto expr = tokenize("xyav -0.5 a"); line
-  // auto expr = tokenize("x v -0.5 av 2 pys"); y=x^2
-  // auto expr = tokenize("x v -0.4 a v 2 p y v -0.5 av 2 p a v -0.14 a");
-  // circle
-  // auto expr = tokenize("v 1 x d v 1 y d a v 10 s");1/x+1/y=10
-  // auto expr = tokenize("x y a x y m v 10 m s"); x+y=10xy
-  //auto expr = tokenize("x v 10 m S v 1 a v 2.5 d y s"); // (sin 10x +1)/2.5 = y
-  auto expr = tokenize("y v 10 m S v 1 a v 2.5 d x s"); // (sin 10x +1)/2.5 = y
+  string sexpr;
+  getline(cin, sexpr);
+  auto expr = tokenize(sexpr);
+  vector<vector<optional<double>>> cache(scr_size,
+                                         vector<optional<double>>(scr_size));
   while (!glfwWindowShouldClose(window)) {
     glBindTexture(GL_TEXTURE_2D, texture);
     for (int C = 0; C < 1 / delta; ++C) {
       if (delta >= 1.0 / scr_size) {
         {
-          // int x = i * scr_size, y = j * scr_size;
-          // image[(x * scr_size + y) * 3 + 0] ^= 255;
-          // image[(x * scr_size + y) * 3 + 1] ^= 255;
-          // image[(x * scr_size + y) * 3 + 2] ^= 255;
           int x = i * scr_size, y = j * scr_size;
           char c = 0;
-          double v = eval(expr, i, j);
+          double v = cache[x][y].hasvalue() ? cache[x][y]
+                                            : (cache[x][y] = eval(expr, i, j));
           bool is = false;
           if (abs(v) < delta) {
             is = true;
             cout << i << " " << j << " " << v << "; 1 / " << 1 / delta << " "
                  << (int)c << endl;
-            // cout << " v" << endl;
-          } else {
-            // cout << " x" << endl;
           }
           image[(x * scr_size + y) * 3 + 0] ^= 255;
           image[(x * scr_size + y) * 3 + 1] = is ? 255 : 0;
           image[(x * scr_size + y) * 3 + 2] = is ? 255 : 0;
-          // image[(x * scr_size + y) * 3 + 1] = 127;
-          // image[(x * scr_size + y) * 3 + 2] = 255;
         }
         {
           auto [I, J, D, T] = get_next(i, j, delta, t);

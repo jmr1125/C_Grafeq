@@ -142,6 +142,19 @@ testeval/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/testeval.dir/build.make CMakeFiles/testeval.dir/build
 .PHONY : testeval/fast
 
+#=============================================================================
+# Target rules for targets named genExpr
+
+# Build rule for target.
+genExpr: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 genExpr
+.PHONY : genExpr
+
+# fast build rule for target.
+genExpr/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/genExpr.dir/build.make CMakeFiles/genExpr.dir/build
+.PHONY : genExpr/fast
+
 eval.o: eval.cpp.o
 .PHONY : eval.o
 
@@ -168,6 +181,30 @@ eval.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/C_GrafEQ.dir/build.make CMakeFiles/C_GrafEQ.dir/eval.cpp.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/testeval.dir/build.make CMakeFiles/testeval.dir/eval.cpp.s
 .PHONY : eval.cpp.s
+
+genexpr.o: genexpr.cpp.o
+.PHONY : genexpr.o
+
+# target to build an object file
+genexpr.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/genExpr.dir/build.make CMakeFiles/genExpr.dir/genexpr.cpp.o
+.PHONY : genexpr.cpp.o
+
+genexpr.i: genexpr.cpp.i
+.PHONY : genexpr.i
+
+# target to preprocess a source file
+genexpr.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/genExpr.dir/build.make CMakeFiles/genExpr.dir/genexpr.cpp.i
+.PHONY : genexpr.cpp.i
+
+genexpr.s: genexpr.cpp.s
+.PHONY : genexpr.s
+
+# target to generate assembly for a file
+genexpr.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/genExpr.dir/build.make CMakeFiles/genExpr.dir/genexpr.cpp.s
+.PHONY : genexpr.cpp.s
 
 main.o: main.cpp.o
 .PHONY : main.o
@@ -226,10 +263,14 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... C_GrafEQ"
+	@echo "... genExpr"
 	@echo "... testeval"
 	@echo "... eval.o"
 	@echo "... eval.i"
 	@echo "... eval.s"
+	@echo "... genexpr.o"
+	@echo "... genexpr.i"
+	@echo "... genexpr.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
