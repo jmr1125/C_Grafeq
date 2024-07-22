@@ -20,4 +20,5 @@ struct term {
 };
 using expression = vector<term>;
 expression tokenize(const std::string &expr);
-double eval(const expression &expr, double var1, double var2);
+double eval(const expression &expr, double var1, double var2, double xmin,
+            double xmax, double ymin, double ymax);

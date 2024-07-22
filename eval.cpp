@@ -38,7 +38,10 @@ expression tokenize(const string &expr) {
   }
   return e;
 }
-double eval(const expression &e, double x, double y) {
+double eval(const expression &e, double x, double y, double xmin, double xmax,
+            double ymin, double ymax) {
+  x = x * xmax + (1 - x) * xmin;
+  y = y * ymax + (1 - y) * ymin;
   stack<double> num;
   double a, b;
   for (auto &i : e) {

@@ -1,0 +1,1 @@
+v 2 xySmSmyxSmav 2.5 v 1.414 mxysmSpav 1 v 3 dv 2.5 v 1.414 mxyamSpav 4 dv 160 xmSsv 160 ymSav 2 d

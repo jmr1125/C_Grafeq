@@ -2,6 +2,7 @@
 #include "eval.h"
 #include <GLFW/glfw3.h>
 #include <cstdlib>
+#include <fstream>
 #include <iostream>
 #include <optional>
 #include <tuple>
@@ -61,7 +62,7 @@ tuple<double, double, double, int> get_next(double i, double j, double delta,
     // cout << "b" << endl;
     return make_tuple(i + delta, initJ, delta, t);
   }
-  if (t < 4) {
+  if (t < 3) {
     // cout << "c" << endl;
     return make_tuple(initI, initJ, delta, t + 1);
   }
@@ -70,8 +71,28 @@ tuple<double, double, double, int> get_next(double i, double j, double delta,
 }
 double i, j, delta = 0.5;
 int t;
-int scr_size = 512;
-int main() {
+int scr_size = 1024;
+bool isInequality = false;
+string filename;
+double xmin, xmax, ymin, ymax;
+int main(int argc, char **argv) {
+  for (int i = 0; i < argc; i++) {
+    if (string(argv[i]) == "-i") {
+      isInequality = true;
+    }
+    if (string(argv[i]) == "-f" && i < argc - 1) {
+      filename = argv[i + 1];
+    }
+  }
+  if (filename == "") {
+    cout << "No filename specified" << endl;
+    return 1;
+  }
+  if (isInequality) {
+    cout << "inequality" << endl;
+  } else {
+    cout << "equation" << endl;
+  }
   if (!glfwInit()) {
     std::cerr << "Failed to initialize GLFW" << std::endl;
     return -1;
@@ -82,7 +103,7 @@ int main() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
   GLFWwindow *window =
-      glfwCreateWindow(scr_size, scr_size, "grafeq", NULL, NULL);
+      glfwCreateWindow(scr_size / 2, scr_size / 2, "grafeq", NULL, NULL);
   if (!window) {
     glfwTerminate();
     return -1;
@@ -155,39 +176,66 @@ int main() {
                         4 * sizeof(GLfloat), (void *)(2 * sizeof(GLfloat)));
 
   string sexpr;
-  getline(cin, sexpr);
+  {
+    if (filename == "-") {
+      getline(cin, sexpr);
+    } else {
+      ifstream f(filename);
+      getline(f, sexpr);
+    }
+  }
+#define GET_CACHE(x, y, i, j)                                                  \
+  (cache[x][y].has_value()                                                     \
+       ? cache[x][y]                                                           \
+       : (cache[x][y] = eval(expr, i, j, xmin, xmax, ymin, ymax)))             \
+      .value()
+  cin >> xmin >> xmax >> ymin >> ymax;
   auto expr = tokenize(sexpr);
   vector<vector<optional<double>>> cache(
       scr_size * (1 + 0.5), vector<optional<double>>(scr_size * (1 + 0.5)));
+  bool done = false;
   while (!glfwWindowShouldClose(window)) {
     glBindTexture(GL_TEXTURE_2D, texture);
-    for (int C = 0; C < 1 / delta; ++C) {
-      if (delta >= 1.0 / scr_size) {
+    if (delta >= 1.0 / scr_size) {
+      for (int C = 0; C < 1 / delta; ++C) {
         {
           int x = i * scr_size, y = j * scr_size;
-#define GET_CACHE(x, y, i, j)                                                  \
-  (cache[x][y].has_value() ? cache[x][y] : (cache[x][y] = eval(expr, i, j)))   \
-      .value()
           double v0 = GET_CACHE(x, y, i, j);
-          double v1 = GET_CACHE(x + delta * scr_size, y, i + delta, j);
-          double v2 = GET_CACHE(x, y + delta * scr_size, i, j + delta);
-          double v3 = GET_CACHE(x + delta * scr_size, y + delta * scr_size,
-                                i + delta, j + delta);
           bool is = false;
-          if ((v0 < 0 || v1 < 0 || v2 < 0 || v3 < 0) &&
-              (v0 > 0 || v1 > 0 || v2 > 0 || v3 > 0)) {
-            is = true;
-            cout << i << " " << j << "; 1 / " << 1 / delta << endl;
+          if (!isInequality) {
+            double v1 = GET_CACHE(x + delta * scr_size, y, i + delta, j);
+            double v2 = GET_CACHE(x, y + delta * scr_size, i, j + delta);
+            double v3 = GET_CACHE(x + delta * scr_size, y + delta * scr_size,
+                                  i + delta, j + delta);
+            if ((v0 < 0 || v1 < 0 || v2 < 0 || v3 < 0) &&
+                (v0 > 0 || v1 > 0 || v2 > 0 || v3 > 0)) {
+              is = true;
+              // cout << i << " " << j << "; 1 / " << 1 / delta << endl;
+            }
+          } else {
+            if (v0 > 0) {
+              is = true;
+              // cout << i << " " << j << "; 1 / " << 1 / delta << " ; v = " <<
+              // v0
+              //      << endl;
+            }
           }
-          image[(x * scr_size + y) * 3 + 0] ^= 255;
+          // image[(x * scr_size + y) * 3 + 0] ^= 255;
           image[(x * scr_size + y) * 3 + 1] = is ? 255 : 0;
           image[(x * scr_size + y) * 3 + 2] = is ? 255 : 0;
         }
         {
-          auto [I, J, D, T] = get_next(i, j, delta, t);
-          i = I, j = J, delta = D, t = T;
+          auto [tI, tJ, tD, tT] = get_next(i, j, delta, t);
+          i = tI, j = tJ, delta = tD, t = tT;
         }
       }
+      cout << (log(delta) / log(2) + log(scr_size) / log(2)) << " " << delta
+           << " " << i << " " << t << endl;
+    } else {
+      if (done = false) {
+        cout << "done." << endl;
+      }
+      done = true;
     }
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, scr_size, scr_size, 0, GL_RGB,
                  GL_UNSIGNED_BYTE, image.data());
