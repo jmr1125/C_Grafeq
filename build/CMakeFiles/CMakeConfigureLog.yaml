@@ -504,3 +504,81 @@ events:
         
       exitCode: 0
 ...
+
+---
+events:
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/Applications/CMake.app/Contents/share/cmake-3.28/Modules/FindOpenMP.cmake:420 (try_compile)"
+      - "/Applications/CMake.app/Contents/share/cmake-3.28/Modules/FindOpenMP.cmake:560 (_OPENMP_GET_SPEC_DATE)"
+      - "CMakeLists.txt:28 (find_package)"
+    description: "Detecting C OpenMP version"
+    directories:
+      source: "/Users/jiang/desktop/C_GrafEq/build/CMakeFiles/CMakeScratch/TryCompile-CdWzoU"
+      binary: "/Users/jiang/desktop/C_GrafEq/build/CMakeFiles/CMakeScratch/TryCompile-CdWzoU"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: "-L/opt/homebrew/Cellar/libxpm/3.5.17/lib -L/opt/homebrew/Cellar/libx11/1.8.9/lib -lXpm -lX11 -L/opt/homebrew/opt/ncurses/lib -L/opt/homebrew/opt/libomp/lib -L/opt/homebrew/opt/llvm@15/lib"
+      CMAKE_OSX_ARCHITECTURES: ""
+      CMAKE_OSX_DEPLOYMENT_TARGET: ""
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "OpenMP_SPECTEST_C_"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/jiang/desktop/C_GrafEq/build/CMakeFiles/CMakeScratch/TryCompile-CdWzoU'
+        
+        Run Build Command(s): /Applications/CMake.app/Contents/bin/cmake -E env VERBOSE=1 /opt/homebrew/bin/gmake -f Makefile cmTC_5a682/fast
+        gmake[2]: Entering directory '/Users/jiang/Desktop/C_GrafEq/build/CMakeFiles/CMakeScratch/TryCompile-CdWzoU'
+        /opt/homebrew/bin/gmake  -f CMakeFiles/cmTC_5a682.dir/build.make CMakeFiles/cmTC_5a682.dir/build
+        gmake[3]: Entering directory '/Users/jiang/Desktop/C_GrafEq/build/CMakeFiles/CMakeScratch/TryCompile-CdWzoU'
+        Building C object CMakeFiles/cmTC_5a682.dir/OpenMPCheckVersion.c.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -Xpreprocessor -fopenmp -I/opt/homebrew/opt/libomp/include/ -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -MD -MT CMakeFiles/cmTC_5a682.dir/OpenMPCheckVersion.c.o -MF CMakeFiles/cmTC_5a682.dir/OpenMPCheckVersion.c.o.d -o CMakeFiles/cmTC_5a682.dir/OpenMPCheckVersion.c.o -c /Users/jiang/desktop/C_GrafEq/build/CMakeFiles/CMakeScratch/TryCompile-CdWzoU/OpenMPCheckVersion.c
+        Linking C executable cmTC_5a682
+        /Applications/CMake.app/Contents/bin/cmake -E cmake_link_script CMakeFiles/cmTC_5a682.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -Xpreprocessor -fopenmp -I/opt/homebrew/opt/libomp/include/ -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names -L/opt/homebrew/Cellar/libxpm/3.5.17/lib -L/opt/homebrew/Cellar/libx11/1.8.9/lib -lXpm -lX11 -L/opt/homebrew/opt/ncurses/lib -L/opt/homebrew/opt/libomp/lib -L/opt/homebrew/opt/llvm@15/lib  CMakeFiles/cmTC_5a682.dir/OpenMPCheckVersion.c.o -o cmTC_5a682 
+        ld: warning: reexported library with install name '/opt/homebrew/opt/llvm@15/lib/libunwind.1.dylib' found at '/opt/homebrew/Cellar/llvm@15/15.0.7/lib/libunwind.1.0.dylib' couldn't be matched with any parent library and will be linked directly
+        gmake[3]: Leaving directory '/Users/jiang/Desktop/C_GrafEq/build/CMakeFiles/CMakeScratch/TryCompile-CdWzoU'
+        gmake[2]: Leaving directory '/Users/jiang/Desktop/C_GrafEq/build/CMakeFiles/CMakeScratch/TryCompile-CdWzoU'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/Applications/CMake.app/Contents/share/cmake-3.28/Modules/FindOpenMP.cmake:420 (try_compile)"
+      - "/Applications/CMake.app/Contents/share/cmake-3.28/Modules/FindOpenMP.cmake:560 (_OPENMP_GET_SPEC_DATE)"
+      - "CMakeLists.txt:28 (find_package)"
+    description: "Detecting CXX OpenMP version"
+    directories:
+      source: "/Users/jiang/desktop/C_GrafEq/build/CMakeFiles/CMakeScratch/TryCompile-gN8Q4L"
+      binary: "/Users/jiang/desktop/C_GrafEq/build/CMakeFiles/CMakeScratch/TryCompile-gN8Q4L"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: "-L/opt/homebrew/Cellar/libxpm/3.5.17/lib -L/opt/homebrew/Cellar/libx11/1.8.9/lib -lXpm -lX11 -L/opt/homebrew/opt/ncurses/lib -L/opt/homebrew/opt/libomp/lib -L/opt/homebrew/opt/llvm@15/lib"
+      CMAKE_OSX_ARCHITECTURES: ""
+      CMAKE_OSX_DEPLOYMENT_TARGET: ""
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk"
+    buildResult:
+      variable: "OpenMP_SPECTEST_CXX_"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/jiang/desktop/C_GrafEq/build/CMakeFiles/CMakeScratch/TryCompile-gN8Q4L'
+        
+        Run Build Command(s): /Applications/CMake.app/Contents/bin/cmake -E env VERBOSE=1 /opt/homebrew/bin/gmake -f Makefile cmTC_0c17d/fast
+        gmake[2]: Entering directory '/Users/jiang/Desktop/C_GrafEq/build/CMakeFiles/CMakeScratch/TryCompile-gN8Q4L'
+        /opt/homebrew/bin/gmake  -f CMakeFiles/cmTC_0c17d.dir/build.make CMakeFiles/cmTC_0c17d.dir/build
+        gmake[3]: Entering directory '/Users/jiang/Desktop/C_GrafEq/build/CMakeFiles/CMakeScratch/TryCompile-gN8Q4L'
+        Building CXX object CMakeFiles/cmTC_0c17d.dir/OpenMPCheckVersion.cpp.o
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -Xpreprocessor -fopenmp -I/opt/homebrew/opt/libomp/include/ -std=gnu++20 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -MD -MT CMakeFiles/cmTC_0c17d.dir/OpenMPCheckVersion.cpp.o -MF CMakeFiles/cmTC_0c17d.dir/OpenMPCheckVersion.cpp.o.d -o CMakeFiles/cmTC_0c17d.dir/OpenMPCheckVersion.cpp.o -c /Users/jiang/desktop/C_GrafEq/build/CMakeFiles/CMakeScratch/TryCompile-gN8Q4L/OpenMPCheckVersion.cpp
+        Linking CXX executable cmTC_0c17d
+        /Applications/CMake.app/Contents/bin/cmake -E cmake_link_script CMakeFiles/cmTC_0c17d.dir/link.txt --verbose=1
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -Xpreprocessor -fopenmp -I/opt/homebrew/opt/libomp/include/ -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.5.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names -L/opt/homebrew/Cellar/libxpm/3.5.17/lib -L/opt/homebrew/Cellar/libx11/1.8.9/lib -lXpm -lX11 -L/opt/homebrew/opt/ncurses/lib -L/opt/homebrew/opt/libomp/lib -L/opt/homebrew/opt/llvm@15/lib  CMakeFiles/cmTC_0c17d.dir/OpenMPCheckVersion.cpp.o -o cmTC_0c17d 
+        ld: warning: reexported library with install name '/opt/homebrew/opt/llvm@15/lib/libunwind.1.dylib' found at '/opt/homebrew/Cellar/llvm@15/15.0.7/lib/libunwind.1.0.dylib' couldn't be matched with any parent library and will be linked directly
+        gmake[3]: Leaving directory '/Users/jiang/Desktop/C_GrafEq/build/CMakeFiles/CMakeScratch/TryCompile-gN8Q4L'
+        gmake[2]: Leaving directory '/Users/jiang/Desktop/C_GrafEq/build/CMakeFiles/CMakeScratch/TryCompile-gN8Q4L'
+        
+      exitCode: 0
+...

@@ -130,6 +130,19 @@ C_GrafEQ/fast:
 .PHONY : C_GrafEQ/fast
 
 #=============================================================================
+# Target rules for targets named testeval
+
+# Build rule for target.
+testeval: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 testeval
+.PHONY : testeval
+
+# fast build rule for target.
+testeval/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/testeval.dir/build.make CMakeFiles/testeval.dir/build
+.PHONY : testeval/fast
+
+#=============================================================================
 # Target rules for targets named genExpr
 
 # Build rule for target.
@@ -148,6 +161,7 @@ eval.o: eval.cpp.o
 # target to build an object file
 eval.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/C_GrafEQ.dir/build.make CMakeFiles/C_GrafEQ.dir/eval.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/testeval.dir/build.make CMakeFiles/testeval.dir/eval.cpp.o
 .PHONY : eval.cpp.o
 
 eval.i: eval.cpp.i
@@ -156,6 +170,7 @@ eval.i: eval.cpp.i
 # target to preprocess a source file
 eval.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/C_GrafEQ.dir/build.make CMakeFiles/C_GrafEQ.dir/eval.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/testeval.dir/build.make CMakeFiles/testeval.dir/eval.cpp.i
 .PHONY : eval.cpp.i
 
 eval.s: eval.cpp.s
@@ -164,6 +179,7 @@ eval.s: eval.cpp.s
 # target to generate assembly for a file
 eval.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/C_GrafEQ.dir/build.make CMakeFiles/C_GrafEQ.dir/eval.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/testeval.dir/build.make CMakeFiles/testeval.dir/eval.cpp.s
 .PHONY : eval.cpp.s
 
 genexpr.o: genexpr.cpp.o
@@ -214,6 +230,30 @@ main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/C_GrafEQ.dir/build.make CMakeFiles/C_GrafEQ.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+testeval.o: testeval.cpp.o
+.PHONY : testeval.o
+
+# target to build an object file
+testeval.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/testeval.dir/build.make CMakeFiles/testeval.dir/testeval.cpp.o
+.PHONY : testeval.cpp.o
+
+testeval.i: testeval.cpp.i
+.PHONY : testeval.i
+
+# target to preprocess a source file
+testeval.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/testeval.dir/build.make CMakeFiles/testeval.dir/testeval.cpp.i
+.PHONY : testeval.cpp.i
+
+testeval.s: testeval.cpp.s
+.PHONY : testeval.s
+
+# target to generate assembly for a file
+testeval.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/testeval.dir/build.make CMakeFiles/testeval.dir/testeval.cpp.s
+.PHONY : testeval.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -224,6 +264,7 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... C_GrafEQ"
 	@echo "... genExpr"
+	@echo "... testeval"
 	@echo "... eval.o"
 	@echo "... eval.i"
 	@echo "... eval.s"
@@ -233,6 +274,9 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... testeval.o"
+	@echo "... testeval.i"
+	@echo "... testeval.s"
 .PHONY : help
 
 

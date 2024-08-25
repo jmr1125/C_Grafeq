@@ -105,7 +105,7 @@ int prec(tok t) {
   case tok::R:
     return -1;
   case tok::seperate:
-    return 1;
+    return -1;
   default:
     return 0;
   }
@@ -235,6 +235,7 @@ int main() {
       op.push(t.t);
       break;
     case tok::seperate:
+      f_flush(t);
       break;
     }
   }

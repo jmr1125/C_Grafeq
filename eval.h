@@ -1,4 +1,7 @@
+#include <ostream>
+#include <utility>
 #include <vector>
+using std::pair;
 using std::vector;
 enum OP {
   ADD,     // a
@@ -18,7 +21,38 @@ struct term {
   OP op;
   double constant;
 };
+struct value {
+  enum type_t { normal, inf, ninf };
+  value() : v(0), type(normal){};
+  value(double x) : v(x), type(normal){};
+  value(double x, type_t t) : v(x), type(t){};
+  double v;
+  type_t type;
+  value operator+(value) const;
+  value operator-(value) const;
+  value operator-() const;
+  value operator*(value) const;
+  value operator/(value) const;
+  bool operator>(value) const;
+  bool operator==(value) const;
+  bool operator<(value) const;
+  bool operator>=(value) const;
+  bool operator<=(value) const;
+  bool operator!=(value) const;
+};
+struct varible {
+  varible() = default;
+  varible(vector<pair<value, value>> r) : ranges(r){};
+  void sort();
+  vector<pair<value, value>> ranges;
+};
+std::ostream &operator<<(std::ostream &, varible);
+std::ostream &operator<<(std::ostream &, value);
 using expression = vector<term>;
 expression tokenize(const std::string &expr);
-double eval(const expression &expr, double var1, double var2, double xmin,
-            double xmax, double ymin, double ymax);
+varible eval(const expression &expr, varible var1, varible var2);
+
+varible pow(varible, varible);
+varible log(varible);
+varible sin(varible);
+varible cos(varible);

@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <optional>
+#include <thread>
 #include <tuple>
 #include <vector>
 
@@ -69,9 +70,10 @@ tuple<double, double, double, int> get_next(double i, double j, double delta,
   // cout << "d" << endl;
   return make_tuple(0, 0, delta / 2, 0);
 }
-double i, j, delta = 0.5;
-int t;
-int scr_size = 1024;
+const int NUM_THREADS = 16;
+double gi, gj, gdelta = 0.5;
+int gt;
+int scr_size = 512;
 bool isInequality = false;
 string filename;
 double xmin, xmax, ymin, ymax;
@@ -103,7 +105,7 @@ int main(int argc, char **argv) {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
   GLFWwindow *window =
-      glfwCreateWindow(scr_size / 2, scr_size / 2, "grafeq", NULL, NULL);
+      glfwCreateWindow(scr_size, scr_size, "grafeq", NULL, NULL);
   if (!window) {
     glfwTerminate();
     return -1;
@@ -184,21 +186,37 @@ int main(int argc, char **argv) {
       getline(f, sexpr);
     }
   }
-#define GET_CACHE(x, y, i, j)                                                  \
-  (cache[x][y].has_value()                                                     \
-       ? cache[x][y]                                                           \
-       : (cache[x][y] = eval(expr, i, j, xmin, xmax, ymin, ymax)))             \
-      .value()
+
   cin >> xmin >> xmax >> ymin >> ymax;
   auto expr = tokenize(sexpr);
-  vector<vector<optional<double>>> cache(
-      scr_size * (1 + 0.5), vector<optional<double>>(scr_size * (1 + 0.5)));
+  vector<vector<double>> cache(scr_size * 1.5, vector<double>(scr_size * 1.5));
+  vector<vector<bool>> cache_b(scr_size * 1.5, vector<bool>(scr_size * 1.5));
+  // #define GET_CACHE(x, y, i, j)                                                  \
+//   (cache_b[x][y] ? cache[x][y]                                                 \
+//                  : (cache[x][y] = eval(expr, i, j, xmin, xmax, ymin, ymax)));  \
+//   cache_b[x][y] = true;
+  // mutex mtx;
+  auto GET_CACHE = [&](int x, int y, double i, double j) {
+    // mtx.lock();
+    bool b = cache_b[x][y];
+    // mtx.unlock();
+    if (!b) {
+      // mtx.lock();
+      double v = eval(expr, i, j, xmin, xmax, ymin, ymax);
+      cache[x][y] = v;
+      cache_b[x][y] = true;
+      // mtx.unlock();
+    }
+    return cache[x][y];
+  };
   bool done = false;
   while (!glfwWindowShouldClose(window)) {
     glBindTexture(GL_TEXTURE_2D, texture);
-    if (delta >= 1.0 / scr_size) {
-      for (int C = 0; C < 1 / delta; ++C) {
-        {
+    if (gdelta >= 1.0 / scr_size) {
+      vector<thread *> threads(NUM_THREADS);
+      for (int C = 0; C < 1 / gdelta; ++C) {
+        threads[C % NUM_THREADS] = new thread([&]() {
+          auto i = gi, j = gj, delta = gdelta;
           int x = i * scr_size, y = j * scr_size;
           double v0 = GET_CACHE(x, y, i, j);
           bool is = false;
@@ -221,16 +239,23 @@ int main(int argc, char **argv) {
             }
           }
           // image[(x * scr_size + y) * 3 + 0] ^= 255;
+          image[(x * scr_size + y) * 3 + 0] = is ? 255 : 0;
           image[(x * scr_size + y) * 3 + 1] = is ? 255 : 0;
           image[(x * scr_size + y) * 3 + 2] = is ? 255 : 0;
-        }
+        });
         {
-          auto [tI, tJ, tD, tT] = get_next(i, j, delta, t);
-          i = tI, j = tJ, delta = tD, t = tT;
+          auto [tI, tJ, tD, tT] = get_next(gi, gj, gdelta, gt);
+          gi = tI, gj = tJ, gdelta = tD, gt = tT;
+        }
+        if (C % NUM_THREADS == 0 && C) {
+          for (int i = 0; i < NUM_THREADS; ++i) {
+            threads[i]->join();
+          }
         }
       }
-      cout << (log(delta) / log(2) + log(scr_size) / log(2)) << " " << delta
-           << " " << i << " " << t << endl;
+
+      cout << (log(gdelta) / log(2) + log(scr_size) / log(2)) << " " << gdelta
+           << " " << gi << " " << gt << endl;
     } else {
       if (done = false) {
         cout << "done." << endl;
