@@ -1,5 +1,8 @@
 
 #include "eval.h"
+#include <algorithm>
+#include <utility>
+#define GL_SILENCE_DEPRECATION
 #include <GLFW/glfw3.h>
 #include <cstdlib>
 #include <fstream>
@@ -51,28 +54,20 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action,
   if (action == GLFW_PRESS && key == GLFW_KEY_ESCAPE)
     glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
-tuple<double, double, double, int> get_next(double i, double j, double delta,
-                                            int t) {
-  double initI = (t < 2) ? 0 : delta / 2;
-  double initJ = (t % 2) ? 0 : delta / 2;
+tuple<double, double, double> get_next(double i, double j, double delta) {
   if (j + delta < 1) {
     // cout << "a" << endl;
-    return make_tuple(i, j + delta, delta, t);
+    return make_tuple(i, j + delta, delta);
   }
   if (i + delta < 1) {
     // cout << "b" << endl;
-    return make_tuple(i + delta, initJ, delta, t);
-  }
-  if (t < 3) {
-    // cout << "c" << endl;
-    return make_tuple(initI, initJ, delta, t + 1);
+    return make_tuple(i + delta, 0, delta);
   }
   // cout << "d" << endl;
-  return make_tuple(0, 0, delta / 2, 0);
+  return make_tuple(0, 0, delta / 2);
 }
 const int NUM_THREADS = 16;
 double gi, gj, gdelta = 0.5;
-int gt;
 int scr_size = 512;
 bool isInequality = false;
 string filename;
@@ -189,75 +184,79 @@ int main(int argc, char **argv) {
 
   cin >> xmin >> xmax >> ymin >> ymax;
   auto expr = tokenize(sexpr);
-  vector<vector<double>> cache(scr_size * 1.5, vector<double>(scr_size * 1.5));
-  vector<vector<bool>> cache_b(scr_size * 1.5, vector<bool>(scr_size * 1.5));
-  // #define GET_CACHE(x, y, i, j)                                                  \
-//   (cache_b[x][y] ? cache[x][y]                                                 \
-//                  : (cache[x][y] = eval(expr, i, j, xmin, xmax, ymin, ymax)));  \
-//   cache_b[x][y] = true;
-  // mutex mtx;
-  auto GET_CACHE = [&](int x, int y, double i, double j) {
-    // mtx.lock();
-    bool b = cache_b[x][y];
-    // mtx.unlock();
-    if (!b) {
-      // mtx.lock();
-      double v = eval(expr, i, j, xmin, xmax, ymin, ymax);
-      cache[x][y] = v;
-      cache_b[x][y] = true;
-      // mtx.unlock();
+  vector<vector<bool>> no_for_sure(scr_size, vector<bool>(scr_size, false));
+  auto GET_CACHE = [&](double i, double j) {
+    if (no_for_sure[i * scr_size][j * scr_size])
+      return false;
+    auto d = gdelta;
+    varible v =
+        eval(expr,
+             add(mul(varible(vector({make_pair(value(i), value(i + d))})),
+                     value(xmax - xmin)),
+                 value(xmin)),
+             add(mul(varible(vector({make_pair(value(j), value(j + d))})),
+                     value(ymax - ymin)),
+                 value(ymin)));
+    // cout << "(" << i << ", " << j << ")" << v << endl;
+    bool is = false;
+    for (auto it = v.ranges.begin(); it != v.ranges.end(); ++it) {
+      if (it->first <= 0 && value(0) <= it->second) {
+        is = true;
+        break;
+      }
     }
-    return cache[x][y];
+    if (!is) {
+      for (int x = i * scr_size; x < min(1.0, i + d) * scr_size; ++x)
+        for (int y = j * scr_size; y < min(1.0, j + d) * scr_size; ++y)
+          no_for_sure[x][y] = true;
+    }
+    return is;
   };
   bool done = false;
   while (!glfwWindowShouldClose(window)) {
     glBindTexture(GL_TEXTURE_2D, texture);
     if (gdelta >= 1.0 / scr_size) {
-      vector<thread *> threads(NUM_THREADS);
-      for (int C = 0; C < 1 / gdelta; ++C) {
-        threads[C % NUM_THREADS] = new thread([&]() {
+      for (int C = 0; C < pow(scr_size * gdelta, 1.5); ++C) {
+#if 0 
+      for (int i = 0; i < scr_size; ++i)
+        for (int j = 0; j < scr_size; ++j)
+          image[(i * scr_size + j) * 3 + 0] =
+              image[(i * scr_size + j) * 3 + 1] =
+                  image[(i * scr_size + j) * 3 + 2] =
+                      no_for_sure[i][j] ? 255 : 0;
+#endif
+        if (!no_for_sure[gi * scr_size][gj * scr_size]) {
           auto i = gi, j = gj, delta = gdelta;
           int x = i * scr_size, y = j * scr_size;
-          double v0 = GET_CACHE(x, y, i, j);
-          bool is = false;
-          if (!isInequality) {
-            double v1 = GET_CACHE(x + delta * scr_size, y, i + delta, j);
-            double v2 = GET_CACHE(x, y + delta * scr_size, i, j + delta);
-            double v3 = GET_CACHE(x + delta * scr_size, y + delta * scr_size,
-                                  i + delta, j + delta);
-            if ((v0 < 0 || v1 < 0 || v2 < 0 || v3 < 0) &&
-                (v0 > 0 || v1 > 0 || v2 > 0 || v3 > 0)) {
-              is = true;
-              // cout << i << " " << j << "; 1 / " << 1 / delta << endl;
-            }
-          } else {
-            if (v0 > 0) {
-              is = true;
-              // cout << i << " " << j << "; 1 / " << 1 / delta << " ; v = " <<
-              // v0
-              //      << endl;
-            }
-          }
+          auto is = GET_CACHE(i, j);
+#if 0
           // image[(x * scr_size + y) * 3 + 0] ^= 255;
-          image[(x * scr_size + y) * 3 + 0] = is ? 255 : 0;
-          image[(x * scr_size + y) * 3 + 1] = is ? 255 : 0;
+          image[(x * scr_size + y) * 3 + 0] = no_for_sure[x][y] ? 255 : 0;
+          image[(x * scr_size + y) * 3 + 1] =
+              (no_for_sure[x][y] && is) ? 255 : 0;
           image[(x * scr_size + y) * 3 + 2] = is ? 255 : 0;
-        });
+#else
+          image[(x * scr_size + y) * 3 + 0] =
+              image[(x * scr_size + y) * 3 + 1] =
+                  image[(x * scr_size + y) * 3 + 2] = is ? 255 : 0;
+#endif
+        } //  else {
+        //   int x = gi * scr_size, y = gj * scr_size;
+        //   image[(x * scr_size + y) * 3 + 0] =
+        //       image[(x * scr_size + y) * 3 + 1] =
+        //           image[(x * scr_size + y) * 3 + 2] = 64;
+        // }
         {
-          auto [tI, tJ, tD, tT] = get_next(gi, gj, gdelta, gt);
-          gi = tI, gj = tJ, gdelta = tD, gt = tT;
-        }
-        if (C % NUM_THREADS == 0 && C) {
-          for (int i = 0; i < NUM_THREADS; ++i) {
-            threads[i]->join();
-          }
+          auto [tI, tJ, tD] = get_next(gi, gj, gdelta);
+          gi = tI, gj = tJ, gdelta = tD;
         }
       }
 
-      cout << (log(gdelta) / log(2) + log(scr_size) / log(2)) << " " << gdelta
-           << " " << gi << " " << gt << endl;
+      // cout << (log(gdelta) / log(2) + log(scr_size) / log(2)) << " " <<
+      // gdelta
+      //      << " " << gi << " " << gt << endl;
     } else {
-      if (done = false) {
+      if (done == false) {
         cout << "done." << endl;
       }
       done = true;

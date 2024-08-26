@@ -43,6 +43,8 @@ struct value {
 struct varible {
   varible() = default;
   varible(vector<pair<value, value>> r) : ranges(r){};
+  varible(value x) : ranges({std::make_pair(x, x)}){};
+  varible(value l, value r) : ranges({std::make_pair(l, r)}){};
   void sort();
   vector<pair<value, value>> ranges;
 };
@@ -56,3 +58,8 @@ varible pow(varible, varible);
 varible log(varible);
 varible sin(varible);
 varible cos(varible);
+varible add(varible, varible);
+varible neg(varible);
+varible mul(varible,varible);
+varible one_div(varible);
+varible div(varible,varible);

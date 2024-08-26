@@ -69,6 +69,8 @@ value value::operator/(value r) const {
   value one_div;
   if (r.type == inf || r.type == ninf)
     one_div = value(0);
+  else
+    one_div = value(1 / r.v);
   return *this * one_div;
 }
 bool value::operator<(value r) const {
@@ -76,13 +78,21 @@ bool value::operator<(value r) const {
     if (r.type == ninf)
       return false;
     if (r.type == inf)
+      return false;
+    if (r.type == normal)
       return true;
   } else if (type == inf) {
     if (r.type == ninf)
       return false;
     if (r.type == inf)
       return false;
+    if (r.type == normal)
+      return false;
   }
+  if (r.type == ninf)
+    return false;
+  if (r.type == inf)
+    return true;
   assert(type == normal && r.type == normal);
   return v < r.v;
 }
@@ -151,17 +161,17 @@ void varible::sort() {
   if (ranges.size() == 1)
     return;
   auto it = ranges.begin() + 1;
-  auto cur = *it;
-  ++it;
+  auto cur = *ranges.begin();
   decltype(ranges) tmp;
   for (; it != ranges.end(); ++it) {
     if (cur.second >= it->first) {
-      cur.second = max(cur.second, it->first);
+      cur.second = max(cur.second, it->second);
     } else {
       tmp.push_back(cur);
       cur = *it;
     }
   }
+  tmp.push_back(cur);
   ranges = tmp;
 }
 varible add(varible a, varible b) {
@@ -173,7 +183,7 @@ varible add(varible a, varible b) {
     }
   }
   ans.sort();
-  return std::move(ans);
+  return ans;
 }
 varible neg(varible a) {
   for (auto &x : a.ranges) {
@@ -182,7 +192,7 @@ varible neg(varible a) {
     x.second = -x.second;
   }
   a.sort();
-  return std::move(a);
+  return a;
 }
 varible mul(varible a, varible b) {
   varible ans;
@@ -198,7 +208,7 @@ varible mul(varible a, varible b) {
     }
   }
   ans.sort();
-  return std::move(ans);
+  return ans;
 }
 varible one_div(varible a) {
   varible ans;
@@ -214,14 +224,14 @@ varible one_div(varible a) {
     } else if (x.second < 0)
       ans.ranges.push_back(make_pair(x2, x1));
     else if (x.first > 0)
-      ans.ranges.push_back(make_pair(x1, x2));
+      ans.ranges.push_back(make_pair(x2, x1));
     else if (x.first == 0)
-      ans.ranges.push_back(make_pair(x2, value::inf));
+      ans.ranges.push_back(make_pair(x2, value(0, value::inf)));
     else if (x.second == 0)
-      ans.ranges.push_back(make_pair(value::ninf, x1));
+      ans.ranges.push_back(make_pair(value(0, value::ninf), x1));
   }
   ans.sort();
-  return std::move(ans);
+  return ans;
 }
 varible div(varible a, varible b) { return mul(a, one_div(b)); }
 varible pow(varible a, varible b) {
@@ -266,52 +276,43 @@ varible pow(varible a, varible b) {
     }
   }
   ans.sort();
-  return std::move(ans);
+  return ans;
 }
 
 varible sin(varible a) {
   varible ans;
   ans.ranges.reserve(a.ranges.size());
   for (const auto x : a.ranges) {
+    if (x.first.type == value::inf || x.second.type == value::inf ||
+        x.first.type == value::ninf || x.second.type == value::ninf) {
+      ans.ranges.push_back({value(-1), value(1)});
+      continue;
+    }
     value low(sin(x.first.v)), high(sin(x.second.v));
-    bool containsPiOver2 = false;
-    bool contains3PiOver2 = false;
-
-    // 检查区间内是否包含 π/2 + 2kπ 或 3π/2 + 2kπ
-    double pi_over_2 = M_PI / 2;
-    double three_pi_over_2 = 3 * M_PI / 2;
-
-    double lowerBound = ceil((x.first.v - pi_over_2) / (2 * M_PI));
-    double upperBound = floor((x.second.v - pi_over_2) / (2 * M_PI));
-
-    if (lowerBound <= upperBound)
-      containsPiOver2 = true;
-
-    lowerBound = ceil((x.first.v - three_pi_over_2) / (2 * M_PI));
-    upperBound = floor((x.second.v - three_pi_over_2) / (2 * M_PI));
-
-    if (lowerBound <= upperBound)
-      contains3PiOver2 = true;
-
-    // 根据是否包含关键点，决定 low 和 high 的值
-    if (containsPiOver2)
-      high = value(1);
-    if (contains3PiOver2)
-      low = value(-1);
 
     // 如果范围大于等于 2π，那么覆盖了整个 [-1, 1] 范围
     if (x.second.v - x.first.v >= 2 * M_PI) {
       low = value(-1);
       high = value(1);
     } else {
-      if (low > high)
-        std::swap(low, high);
+      auto l = x.first.v;
+      auto r = x.second.v;
+      if (l <= M_PI / 2 && M_PI / 2 <= r)
+        high = max(high, value(1));
+      if (l <= 3 * M_PI / 2 && 3 * M_PI / 2 <= r)
+        low = min(low, value(-1));
+      if (l <= 5 * M_PI / 2 && 5 * M_PI / 2 <= r)
+        high = max(high, value(1));
+      if (l <= 7 * M_PI / 2 && 7 * M_PI / 2 <= r)
+        low = min(low, value(-1));
     }
+    if (low > high)
+      std::swap(low, high);
 
     ans.ranges.push_back({low, high});
   }
   ans.sort();
-  return std::move(ans);
+  return ans;
 }
 varible cos(varible a) {
   varible ans;
@@ -323,12 +324,6 @@ varible cos(varible a) {
       continue;
     }
     value low(cos(x.first.v)), high(cos(x.second.v));
-    bool contains0Pi = false;
-    bool containsPi = false;
-
-    // 检查区间内是否包含 2kπ 或 π + 2kπ
-    double pi = M_PI;
-    double zero_pi = 0;
 
     // 如果范围大于等于 2π，那么覆盖了整个 [-1, 1] 范围
     if (x.second.v - x.first.v >= 2 * M_PI) {
@@ -363,7 +358,7 @@ varible cos(varible a) {
     ans.ranges.push_back({low, high});
   }
   ans.sort();
-  return std::move(ans);
+  return ans;
 }
 varible log(varible a) {
   varible ans;
@@ -371,20 +366,23 @@ varible log(varible a) {
   for (const auto &x : a.ranges) {
     if (x.first.type == value::ninf && x.second.type == value::inf) {
       // log([-inf, inf]) = [-inf, inf]
-      ans.ranges.push_back({value::ninf, value::inf});
+      ans.ranges.push_back({value(0, value::ninf), value(0, value::inf)});
     } else if (x.first.v <= 0 && x.second.type == value::inf) {
       // log([x, inf]) = [log(x), inf] and x.first <= 0
-      ans.ranges.push_back({value::ninf, value::inf});
+      ans.ranges.push_back({value(0, value::ninf), value(0, value::inf)});
     } else if (x.first.v <= 0 && x.second.v > 0) {
       // log([a, x]) where a <= 0 = [-inf, log(x)]
-      ans.ranges.push_back({value::ninf, value(log(x.second.v))});
+      ans.ranges.push_back({value(0, value::ninf), value(log(x.second.v))});
     } else if (x.first.v > 0) {
       // log([a, b]) where a > 0 = [log(a), log(b)]
-      ans.ranges.push_back({value(log(x.first.v)), value(log(x.second.v))});
+      if (x.second.type == value::inf)
+        ans.ranges.push_back({value(log(x.first.v)), value(0, value::inf)});
+      else
+        ans.ranges.push_back({value(log(x.first.v)), value(log(x.second.v))});
     }
   }
   ans.sort();
-  return std::move(ans);
+  return ans;
 }
 
 varible eval(const expression &e, varible x, varible y) {

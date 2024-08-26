@@ -1,4 +1,5 @@
 #include "eval.h"
+#include <ios>
 #include <iostream>
 using namespace std;
 
@@ -17,4 +18,53 @@ int main() {
   cout << cos(varible({make_pair(value(.01), value(3.15))})) << endl;
   cout << cos(varible({make_pair(value(-.01), value(3.13))})) << endl;
   cout << cos(varible({make_pair(value(-.01), value(3.15))})) << endl;
+  cout << endl << boolalpha;
+  cout << (value(1) < 2) << endl;
+  cout << (value(1) <= 2) << endl;
+  cout << (value(1) < value(0, value::inf)) << endl;
+  cout << (value(0, value::ninf) < value(0)) << endl;
+  cout << (value(0, value::ninf) < value(0, value::inf)) << endl;
+  cout << endl;
+  cout << (value(3) < 2) << endl;
+  cout << (value(2) <= 2) << endl;
+  cout << (value(0, value::inf) < value(0, value::inf)) << endl;
+  cout << (value(0, value::ninf) < value(0, value::ninf)) << endl;
+  cout << (value(0, value::ninf) > value(0, value::inf)) << endl;
+  cout << endl;
+  cout << (value(3) == 2) << endl;
+  cout << (value(2) == 2) << endl;
+  cout << (value(0, value::inf) == value(0, value::inf)) << endl;
+  cout << (value(0, value::ninf) == value(0, value::ninf)) << endl;
+  cout << (value(0, value::ninf) == value(0, value::inf)) << endl;
+  cout << endl;
+  cout << varible(value(1)) << endl;
+  cout << varible(value(1), value(2)) << endl;
+  cout << one_div(varible(value(1), value(2))) << endl;
+  cout << one_div(varible(value(-2), value(-1))) << endl;
+  cout << one_div(varible(value(-2), value(1))) << endl;
+  cout << one_div(varible(value(-2), value(0, value::inf))) << endl;
+  cout << one_div(varible(value(2), value(0, value::inf))) << endl;
+  cout << one_div(varible(value(0, value::ninf), value(-2))) << endl;
+  cout << one_div(varible(value(0, value::ninf), value(2))) << endl;
+  cout << one_div(varible(value(0, value::ninf), value(0, value::inf))) << endl;
+  cout << endl;
+  cout << one_div(one_div(varible(value(1), value(2)))) << endl;
+  cout << one_div(one_div(varible(value(-1), value(2)))) << endl;
+  cout << one_div(one_div(varible(value(-2), value(-1)))) << endl;
+  cout << one_div(one_div(varible(value(-2), value(0)))) << endl;
+  cout << one_div(one_div(varible(value(0), value(2)))) << endl;
+  cout << endl;
+  cout << mul(varible(1, 2), varible(3, 4)) << endl;
+  cout << mul(varible(1, 2), varible(-3, 4)) << endl;
+  cout << mul(varible(1, 2), varible(-4, -3)) << endl;
+  cout << endl;
+  cout << log(varible(1, 3)) << endl;
+  cout << log(varible(1, value(0, value::inf))) << endl;
+  cout << log(varible(0.5, value(0, value::inf))) << endl;
+  cout << log(varible(0, value(3))) << endl;
+  cout << log(varible(-1, value(3))) << endl;
+  cout << log(varible(value(0, value::ninf), value(3))) << endl;
+  cout << log(varible(0, value(0, value::inf))) << endl;
+  cout << log(varible(-1, value(0, value::inf))) << endl;
+  cout << log(varible(value(0, value::ninf), value(0, value::inf))) << endl;
 }
