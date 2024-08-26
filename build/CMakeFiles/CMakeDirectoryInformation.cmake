@@ -3,7 +3,7 @@
 
 # Relative path conversion top directories.
 set(CMAKE_RELATIVE_PATH_TOP_SOURCE "/Users/jiang/desktop/C_GrafEq")
-set(CMAKE_RELATIVE_PATH_TOP_BINARY "/Users/jiang/desktop/C_GrafEq/build")
+set(CMAKE_RELATIVE_PATH_TOP_BINARY "/Users/jiang/Desktop/C_GrafEq/build")
 
 # Force unix paths in dependencies.
 set(CMAKE_FORCE_UNIX_PATHS 1)

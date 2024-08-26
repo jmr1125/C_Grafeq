@@ -158,7 +158,7 @@ ostream &operator<<(ostream &ost, varible x) {
 }
 void varible::sort() {
   ::sort(ranges.begin(), ranges.end());
-  if (ranges.size() == 1)
+  if (ranges.size() <= 1)
     return;
   auto it = ranges.begin() + 1;
   auto cur = *ranges.begin();
@@ -290,24 +290,30 @@ varible sin(varible a) {
     }
     value low(sin(x.first.v)), high(sin(x.second.v));
 
-    // 如果范围大于等于 2π，那么覆盖了整个 [-1, 1] 范围
-    if (x.second.v - x.first.v >= 2 * M_PI) {
-      low = value(-1);
-      high = value(1);
-    } else {
-      auto l = x.first.v;
-      auto r = x.second.v;
-      if (l <= M_PI / 2 && M_PI / 2 <= r)
-        high = max(high, value(1));
-      if (l <= 3 * M_PI / 2 && 3 * M_PI / 2 <= r)
-        low = min(low, value(-1));
-      if (l <= 5 * M_PI / 2 && 5 * M_PI / 2 <= r)
-        high = max(high, value(1));
-      if (l <= 7 * M_PI / 2 && 7 * M_PI / 2 <= r)
-        low = min(low, value(-1));
-    }
     if (low > high)
-      std::swap(low, high);
+      swap(low, high);
+    {
+      // min (-0.5 1.5 3.5 5.5)
+      // max (-1.5 0.5 2.5 4.5)
+      double l;
+      double r;
+      l = x.first.v / M_PI;
+      r = x.second.v / M_PI;
+      l += 0.5;
+      r += 0.5;
+      l /= 2;
+      r /= 2;
+      if (r - l >= 1 || ceil(l) == floor(r))
+        low = min(low, value(-1));
+      l = x.first.v / M_PI;
+      r = x.second.v / M_PI;
+      l -= 0.5;
+      r -= 0.5;
+      l /= 2;
+      r /= 2;
+      if (r - l >= 1 || ceil(l) == floor(r))
+        high = max(high, value(1));
+    }
 
     ans.ranges.push_back({low, high});
   }
@@ -324,36 +330,24 @@ varible cos(varible a) {
       continue;
     }
     value low(cos(x.first.v)), high(cos(x.second.v));
-
-    // 如果范围大于等于 2π，那么覆盖了整个 [-1, 1] 范围
-    if (x.second.v - x.first.v >= 2 * M_PI) {
-      low = value(-1);
-      high = value(1);
-    } else {
-      auto l = x.first.v;
-      auto r = x.second.v;
-      int k = l / (2 * M_PI);
-      l -= k * 2 * M_PI;
-      r -= k * 2 * M_PI;
-      if (l < 0) {
-        l += 2 * M_PI;
-        r += 2 * M_PI;
-      }
-      if (l == 0) {
-        high = max(high, value(1));
-      }
-      if (l <= M_PI && M_PI <= r) {
-        low = min(low, value(-1));
-      }
-      if (l <= M_PI * 2 && M_PI * 2 <= r) {
-        high = max(high, value(1));
-      }
-      if (l <= M_PI * 3 && M_PI * 3 <= r) {
-        low = min(low, value(-1));
-      }
-    }
     if (low > high)
       std::swap(low, high);
+    {
+      // min (-1 1 3 5)
+      // max (-2 0 2 4)
+      double l, r;
+      l = x.first.v / M_PI;
+      r = x.second.v / M_PI;
+      l += 1, r += 1;
+      l /= 2, r /= 2;
+      if (r - l >= 1 || ceil(l) == floor(r))
+        low = min(low, value(-1));
+      l = x.first.v / M_PI;
+      r = x.second.v / M_PI;
+      l /= 2, r /= 2;
+      if (r - l >= 1 || ceil(l) == floor(r))
+        high = max(high, value(1));
+    }
 
     ans.ranges.push_back({low, high});
   }

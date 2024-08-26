@@ -67,4 +67,8 @@ int main() {
   cout << log(varible(0, value(0, value::inf))) << endl;
   cout << log(varible(-1, value(0, value::inf))) << endl;
   cout << log(varible(value(0, value::ninf), value(0, value::inf))) << endl;
+  cout << endl;
+  cout << sin(varible(M_PI * 4, M_PI * 5)) << endl;
+  cout << div(sin(varible(1.3125, 1.3125 + 0.0625)),
+              cos(varible(varible(1.3125, 1.3125 + 0.0625))));
 }

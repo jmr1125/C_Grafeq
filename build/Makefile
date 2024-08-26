@@ -60,7 +60,7 @@ EQUALS = =
 CMAKE_SOURCE_DIR = /Users/jiang/desktop/C_GrafEq
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/jiang/desktop/C_GrafEq/build
+CMAKE_BINARY_DIR = /Users/jiang/Desktop/C_GrafEq/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/jiang/desktop/C_GrafEq/build/CMakeFiles /Users/jiang/desktop/C_GrafEq/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/jiang/Desktop/C_GrafEq/build/CMakeFiles /Users/jiang/Desktop/C_GrafEq/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/jiang/desktop/C_GrafEq/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/jiang/Desktop/C_GrafEq/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target

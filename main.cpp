@@ -54,20 +54,6 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action,
   if (action == GLFW_PRESS && key == GLFW_KEY_ESCAPE)
     glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
-tuple<double, double, double> get_next(double i, double j, double delta) {
-  if (j + delta < 1) {
-    // cout << "a" << endl;
-    return make_tuple(i, j + delta, delta);
-  }
-  if (i + delta < 1) {
-    // cout << "b" << endl;
-    return make_tuple(i + delta, 0, delta);
-  }
-  // cout << "d" << endl;
-  return make_tuple(0, 0, delta / 2);
-}
-const int NUM_THREADS = 16;
-double gi, gj, gdelta = 0.5;
 int scr_size = 512;
 bool isInequality = false;
 string filename;
@@ -183,83 +169,114 @@ int main(int argc, char **argv) {
   }
 
   cin >> xmin >> xmax >> ymin >> ymax;
+  // xmin = ymin = -10;
+  // xmax = ymax = 10;
   auto expr = tokenize(sexpr);
-  vector<vector<bool>> no_for_sure(scr_size, vector<bool>(scr_size, false));
-  auto GET_CACHE = [&](double i, double j) {
+  vector<vector<char>> no_for_sure(scr_size, vector<char>(scr_size, false));
+  auto GET_CACHE = [&](double i, double j, double d) {
     if (no_for_sure[i * scr_size][j * scr_size])
       return false;
-    auto d = gdelta;
     varible v =
         eval(expr,
-             add(mul(varible(vector({make_pair(value(i), value(i + d))})),
+             add(mul(varible(vector({make_pair(value(j), value(j + d))})),
                      value(xmax - xmin)),
                  value(xmin)),
-             add(mul(varible(vector({make_pair(value(j), value(j + d))})),
+             add(mul(varible(vector({make_pair(value(i), value(i + d))})),
                      value(ymax - ymin)),
                  value(ymin)));
     // cout << "(" << i << ", " << j << ")" << v << endl;
     bool is = false;
     for (auto it = v.ranges.begin(); it != v.ranges.end(); ++it) {
-      if (it->first <= 0 && value(0) <= it->second) {
-        is = true;
-        break;
+      if (isInequality) {
+        if (value(0) <= it->second) {
+          is = true;
+          break;
+        }
+      } else {
+        if (it->first <= 0 && value(0) <= it->second) {
+          is = true;
+          break;
+        }
       }
     }
     if (!is) {
+      cout << i << ' ' << j << ' ' << d << " " << v << endl;
+      cout << i * (ymax - ymin) + ymin << ' ' << j * (xmax - xmin) + xmin << ' '
+           << d * (ymax - ymin) << " " << d * (xmax - xmin) << " " << v << endl;
       for (int x = i * scr_size; x < min(1.0, i + d) * scr_size; ++x)
-        for (int y = j * scr_size; y < min(1.0, j + d) * scr_size; ++y)
+        for (int y = j * scr_size; y < min(1.0, j + d) * scr_size; ++y) {
+          image[(x * scr_size + y) * 3 + 0] =
+              image[(x * scr_size + y) * 3 + 1] =
+                  image[(x * scr_size + y) * 3 + 2] = 255;
           no_for_sure[x][y] = true;
+        }
     }
     return is;
   };
   bool done = false;
+  bool stop = false;
+  double delta = 0.5;
+  vector<tuple<double, double, double>> need_to_draw;
+  auto it = 0;
   while (!glfwWindowShouldClose(window)) {
     glBindTexture(GL_TEXTURE_2D, texture);
-    if (gdelta >= 1.0 / scr_size) {
-      for (int C = 0; C < pow(scr_size * gdelta, 1.5); ++C) {
-#if 0 
-      for (int i = 0; i < scr_size; ++i)
-        for (int j = 0; j < scr_size; ++j)
-          image[(i * scr_size + j) * 3 + 0] =
-              image[(i * scr_size + j) * 3 + 1] =
-                  image[(i * scr_size + j) * 3 + 2] =
-                      no_for_sure[i][j] ? 255 : 0;
-#endif
-        if (!no_for_sure[gi * scr_size][gj * scr_size]) {
-          auto i = gi, j = gj, delta = gdelta;
-          int x = i * scr_size, y = j * scr_size;
-          auto is = GET_CACHE(i, j);
-#if 0
-          // image[(x * scr_size + y) * 3 + 0] ^= 255;
-          image[(x * scr_size + y) * 3 + 0] = no_for_sure[x][y] ? 255 : 0;
-          image[(x * scr_size + y) * 3 + 1] =
-              (no_for_sure[x][y] && is) ? 255 : 0;
-          image[(x * scr_size + y) * 3 + 2] = is ? 255 : 0;
-#else
-          image[(x * scr_size + y) * 3 + 0] =
-              image[(x * scr_size + y) * 3 + 1] =
-                  image[(x * scr_size + y) * 3 + 2] = is ? 255 : 0;
-#endif
-        } //  else {
-        //   int x = gi * scr_size, y = gj * scr_size;
-        //   image[(x * scr_size + y) * 3 + 0] =
-        //       image[(x * scr_size + y) * 3 + 1] =
-        //           image[(x * scr_size + y) * 3 + 2] = 64;
-        // }
-        {
-          auto [tI, tJ, tD] = get_next(gi, gj, gdelta);
-          gi = tI, gj = tJ, gdelta = tD;
+    bool done = false;
+    if (!stop) {
+      for (int C = 0; C < 1 // pow(scr_size, 1.5)
+           ;
+           ++C) {
+        if (it == need_to_draw.size()) {
+          done = true;
+          it = 0;
+          break;
         }
-      }
 
-      // cout << (log(gdelta) / log(2) + log(scr_size) / log(2)) << " " <<
-      // gdelta
-      //      << " " << gi << " " << gt << endl;
-    } else {
-      if (done == false) {
-        cout << "done." << endl;
+        if (!no_for_sure[get<0>(need_to_draw[it]) * scr_size]
+                        [get<1>(need_to_draw[it]) * scr_size]) {
+          auto is = apply(GET_CACHE, need_to_draw[it]);
+        }
+
+        ++it;
       }
-      done = true;
+      cout << it << "/" << need_to_draw.size() << endl;
+      if (done) {
+        // for (int i = 0; i < scr_size; ++i) {
+        //   for (int j = 0; j < scr_size; ++j) {
+        //     if (!no_for_sure[i][j])
+        //       image[(i * scr_size + j) * 3 + 0] =
+        //           image[(i * scr_size + j) * 3 + 1] =
+        //               image[(i * scr_size + j) * 3 + 2] = 0;
+        //   }
+        // }
+        delta /= 2;
+        if (delta < 1.0 / scr_size) {
+          stop = true;
+          for (int i = 0; i < scr_size; ++i) {
+            // x= v*(max-min)+min
+            auto x0 = -xmin / (xmax - xmin);
+            auto y0 = -ymin / (ymax - ymin);
+            if (0 <= x0 && x0 <= 1) {
+              image[(i * scr_size + int(x0 * scr_size)) * 3 + 0] = 128;
+            }
+            if (0 <= y0 && y0 <= 1) {
+              image[(int(y0 * scr_size) * scr_size + i) * 3 + 0] = 128;
+            }
+          }
+          cout << "done." << endl;
+        }
+        cout << delta << endl;
+        vector<tuple<double, double, double>> t;
+        t.clear();
+        t.reserve(1.0 / delta / delta);
+        for (double i = 0; i < 1; i += delta) {
+          for (double j = 0; j < 1; j += delta) {
+            if (!no_for_sure[i * scr_size][j * scr_size]) {
+              t.push_back({i, j, delta});
+            }
+          }
+        }
+        need_to_draw = t;
+      }
     }
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, scr_size, scr_size, 0, GL_RGB,
                  GL_UNSIGNED_BYTE, image.data());
