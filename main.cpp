@@ -187,8 +187,7 @@ int main(int argc, char **argv) {
     }
     if (is == point_status::need_to_divide && undefined) {
       // color0 = 255; // r
-      color0 = 64;
-      color1 = color2 = 0;
+      color0 = color1 = color2 = 0;
     }
     if (is == point_status::need_to_divide && !undefined) {
       color1 = 255; // g
@@ -245,7 +244,7 @@ int main(int argc, char **argv) {
         }
       }
     }
-    // cout << i << ' ' << j << ' ' << d << " " << v << endl;
+    cout << i << ' ' << j << ' ' << d << " " << v << endl;
     cout << i * (ymax - ymin) + ymin << ' ' << j * (xmax - xmin) + xmin << ' '
          << d * (ymax - ymin) << " " << d * (xmax - xmin) << " " << v << endl;
     for (int x = i * scr_size; x < min(1.0, i + d) * scr_size; ++x)
@@ -268,15 +267,18 @@ int main(int argc, char **argv) {
     glBindTexture(GL_TEXTURE_2D, texture);
     bool done = false;
     if (!stop) {
-      for (int C = 0;
-           C <
+      auto t = time(0);
+      for (int C = 0; C <
 #if 1
-           min(max(need_to_draw.size(), (size_t)1), (size_t)10000) // 1
+                      max(need_to_draw.size(), (size_t)1) // 1
 #else
-           1 // 0
+                      1 // 0
 #endif
            ;
            ++C) {
+        if (time(0) - t >= 1) {
+          break;
+        }
         if (it == need_to_draw.size()) {
           done = true;
           it = 0;

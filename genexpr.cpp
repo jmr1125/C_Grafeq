@@ -213,7 +213,7 @@ int main() {
   // cout << "======" << endl;
   stack<tok> op;
   auto f_flush = [&](term t) {
-    while (!op.empty() && prec(t.t) < prec(op.top()) && op.top() != tok::L) {
+    while (!op.empty() && prec(t.t) <= prec(op.top()) && op.top() != tok::L) {
       auto o = op.top();
       op.pop();
       cout << term(o, 0);
