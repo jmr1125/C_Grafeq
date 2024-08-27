@@ -42,11 +42,13 @@ struct value {
 };
 struct varible {
   varible() = default;
-  varible(vector<pair<value, value>> r) : ranges(r){};
-  varible(value x) : ranges({std::make_pair(x, x)}){};
-  varible(value l, value r) : ranges({std::make_pair(l, r)}){};
+  varible(vector<pair<value, value>> r) : ranges(r), has_undefined(false){};
+  varible(value x) : ranges({std::make_pair(x, x)}), has_undefined(false){};
+  varible(value l, value r)
+      : ranges({std::make_pair(l, r)}), has_undefined(false){};
   void sort();
   vector<pair<value, value>> ranges;
+  bool has_undefined;
 };
 std::ostream &operator<<(std::ostream &, varible);
 std::ostream &operator<<(std::ostream &, value);
@@ -60,6 +62,6 @@ varible sin(varible);
 varible cos(varible);
 varible add(varible, varible);
 varible neg(varible);
-varible mul(varible,varible);
+varible mul(varible, varible);
 varible one_div(varible);
-varible div(varible,varible);
+varible div(varible, varible);

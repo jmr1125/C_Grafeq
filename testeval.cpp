@@ -1,4 +1,5 @@
 #include "eval.h"
+#include <cmath>
 #include <ios>
 #include <iostream>
 using namespace std;
@@ -71,4 +72,13 @@ int main() {
   cout << sin(varible(M_PI * 4, M_PI * 5)) << endl;
   cout << div(sin(varible(1.3125, 1.3125 + 0.0625)),
               cos(varible(varible(1.3125, 1.3125 + 0.0625))));
+  cout << div(sin(varible(3.11 / 2, 3.13 / 2)),
+              cos(varible(3.11 / 2, 3.13 / 2)))
+       << endl;
+  cout << div(sin(varible(3.13 / 2, 3.15 / 2)),
+              cos(varible(3.13 / 2, 3.15 / 2)))
+       << endl;
+  cout << one_div(cos(varible(3.13 / 2, 3.15 / 2))) << endl;
+  cout << one_div(cos(varible(3.15 / 2, 3.17 / 2))) << endl;
+  cout << one_div(sin(varible(-5 * M_PI + 0.1, -4 * M_PI - 0.1))) << endl;
 }

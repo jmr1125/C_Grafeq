@@ -1,3 +1,4 @@
+#include <cctype>
 #include <iostream>
 #include <regex>
 #include <stack>
@@ -114,6 +115,16 @@ int prec(tok t) {
 int main() {
   string exp;
   getline(cin, exp);
+  // {
+  //   string exp1;
+  //   for (int i = 0; i < exp.size(); ++i) {
+  //     exp1 += exp[i];
+  //     if (isdigit(exp[i + 1]) || exp[i + 1] == '.' || exp[i + 1] == '+' ||
+  //         exp[i + 1] == '-')
+  //       exp1 += ' ';
+  //   }
+  //   exp = exp1;
+  // }
   //   exp="1/(x-1)*x";
   // exp = "x+y";
   exp = "(" + exp + ")";

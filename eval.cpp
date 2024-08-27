@@ -78,7 +78,7 @@ bool value::operator<(value r) const {
     if (r.type == ninf)
       return false;
     if (r.type == inf)
-      return false;
+      return true;
     if (r.type == normal)
       return true;
   } else if (type == inf) {
@@ -154,6 +154,8 @@ ostream &operator<<(ostream &ost, varible x) {
   for (const auto &x : x.ranges) {
     ost << "[" << x.first << "," << x.second << "] ";
   }
+  if (x.has_undefined)
+    ost << "has undefined";
   return ost;
 }
 void varible::sort() {
@@ -182,6 +184,7 @@ varible add(varible a, varible b) {
       ans.ranges.push_back({A.first + B.first, A.second + B.second});
     }
   }
+  ans.has_undefined = (a.has_undefined || b.has_undefined);
   ans.sort();
   return ans;
 }
@@ -207,6 +210,7 @@ varible mul(varible a, varible b) {
           {min(min(a, b), min(c, d)), max(max(a, b), max(c, d))});
     }
   }
+  ans.has_undefined = (a.has_undefined || b.has_undefined);
   ans.sort();
   return ans;
 }
@@ -221,15 +225,19 @@ varible one_div(varible a) {
           make_pair(value(0, value::ninf), value(value(1) / x.first)));
       ans.ranges.push_back(
           make_pair(value(value(1) / x.second), value(0, value::inf)));
+      ans.has_undefined = (ans.has_undefined || true);
     } else if (x.second < 0)
       ans.ranges.push_back(make_pair(x2, x1));
     else if (x.first > 0)
       ans.ranges.push_back(make_pair(x2, x1));
     else if (x.first == 0)
-      ans.ranges.push_back(make_pair(x2, value(0, value::inf)));
+      ans.ranges.push_back(make_pair(x2, value(0, value::inf))),
+          ans.has_undefined = (ans.has_undefined || true);
     else if (x.second == 0)
-      ans.ranges.push_back(make_pair(value(0, value::ninf), x1));
+      ans.ranges.push_back(make_pair(value(0, value::ninf), x1)),
+          ans.has_undefined = (ans.has_undefined || true);
   }
+  ans.has_undefined = (ans.has_undefined || a.has_undefined);
   ans.sort();
   return ans;
 }
@@ -275,6 +283,7 @@ varible pow(varible a, varible b) {
       ans.ranges.push_back({low, high});
     }
   }
+  ans.has_undefined = (a.has_undefined || b.has_undefined);
   ans.sort();
   return ans;
 }
@@ -314,9 +323,10 @@ varible sin(varible a) {
       if (r - l >= 1 || ceil(l) == floor(r))
         high = max(high, value(1));
     }
-
     ans.ranges.push_back({low, high});
   }
+
+  ans.has_undefined = a.has_undefined;
   ans.sort();
   return ans;
 }
@@ -348,9 +358,10 @@ varible cos(varible a) {
       if (r - l >= 1 || ceil(l) == floor(r))
         high = max(high, value(1));
     }
-
     ans.ranges.push_back({low, high});
   }
+
+  ans.has_undefined = a.has_undefined;
   ans.sort();
   return ans;
 }
@@ -375,6 +386,7 @@ varible log(varible a) {
         ans.ranges.push_back({value(log(x.first.v)), value(log(x.second.v))});
     }
   }
+  ans.has_undefined = a.has_undefined;
   ans.sort();
   return ans;
 }
@@ -439,7 +451,7 @@ varible eval(const expression &e, varible x, varible y) {
     case TAN:
       a = num.top();
       num.pop();
-      num.push(mul(sin(a), one_div(cos(a))));
+      num.push(div(sin(a), cos(a)));
       break;
     case VAR1:
       num.push(x);
