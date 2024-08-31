@@ -60,6 +60,7 @@ varible pow(varible, varible);
 varible log(varible);
 varible sin(varible);
 varible cos(varible);
+varible tan(varible);
 varible add(varible, varible);
 varible neg(varible);
 varible mul(varible, varible);

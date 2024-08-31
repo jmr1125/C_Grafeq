@@ -45,16 +45,16 @@ value value::operator*(value r) const {
   if (type == inf && r.type == inf)
     return value(0, inf);
   if (type == inf && r.type == normal)
-    return value(0, inf);
+    return value(0, r.v > 0 ? inf : ninf);
   if (r.type == inf && type == normal)
-    return value(0, inf);
+    return value(0, v > 0 ? inf : ninf);
 
   if (type == ninf && r.type == ninf)
     return value(0, inf);
   if (type == ninf && r.type == normal)
-    return value(0, ninf);
+    return value(0, r.v > 0 ? ninf : inf);
   if (r.type == ninf && type == normal)
-    return value(0, ninf);
+    return value(0, v > 0 ? ninf : inf);
 
   if (type == inf && r.type == ninf)
     return value(0, ninf);
@@ -242,36 +242,15 @@ varible one_div(varible a) {
   return ans;
 }
 varible div(varible a, varible b) { return mul(a, one_div(b)); }
+varible tan(varible a) { return div(sin(a), cos(a)); }
 varible pow(varible a, varible b) {
   varible ans;
   ans.ranges.reserve(a.ranges.size() * b.ranges.size());
   for (const auto A : a.ranges) {
     for (const auto B : b.ranges) {
       value low, high;
-
-      if (A.first.type == value::inf || A.second.type == value::inf) {
-        if (B.first.type == value::ninf || B.second.type == value::ninf) {
-          low = value(0);
-          high = value(0);
-        } else if (B.first.type == value::inf || B.second.type == value::inf) {
-          low = value(0);
-          high = value::inf;
-        } else {
-          low = value(0);
-          high = value::inf;
-        }
-      } else if (A.first.type == value::ninf || A.second.type == value::ninf) {
-        if (B.first.type == value::ninf || B.second.type == value::ninf) {
-          low = value(0);
-          high = value(0);
-        } else if (B.first.type == value::inf || B.second.type == value::inf) {
-          low = value(0);
-          high = value::inf;
-        } else {
-          low = value::ninf;
-          high = value(0);
-        }
-      } else {
+      if (A.first.type == value::normal && A.second.type == value::normal &&
+          B.first.type == value::normal && B.second.type == value::normal) {
         auto p1 = std::pow(A.first.v, B.first.v);
         auto p2 = std::pow(A.first.v, B.second.v);
         auto p3 = std::pow(A.second.v, B.first.v);
@@ -422,7 +401,7 @@ varible eval(const expression &e, varible x, varible y) {
       num.pop();
       a = num.top();
       num.pop();
-      num.push(mul(a, one_div(b)));
+      num.push(div(a, b));
       break;
     case POW:
       b = num.top();
@@ -451,7 +430,7 @@ varible eval(const expression &e, varible x, varible y) {
     case TAN:
       a = num.top();
       num.pop();
-      num.push(div(sin(a), cos(a)));
+      num.push(tan(a));
       break;
     case VAR1:
       num.push(x);

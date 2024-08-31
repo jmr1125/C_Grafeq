@@ -55,28 +55,114 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action,
     glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 int scr_size = 512;
-bool isInequality = false;
-string filename;
 double xmin, xmax, ymin, ymax;
 enum class point_status { need_to_divide = 0, no, yes };
+struct expr_drawer {
+  expression expr;
+  bool isInequality;
+  vector<tuple<double, double, double>> need_to_draw;
+  vector<vector<point_status>> status =
+      vector(scr_size + 1, vector(scr_size + 1, point_status::need_to_divide));
+  vector<tuple<double, double, double>> next_to_draw;
+  char c1, c2, c3;
+  bool process(double i, double j, double d) {
+    if (status[i * scr_size][j * scr_size] == point_status::no)
+      return false;
+    if (status[i * scr_size][j * scr_size] == point_status::yes)
+      return true;
+    varible v =
+        eval(expr,
+             add(mul(varible(vector({make_pair(value(j), value(j + d))})),
+                     value(xmax - xmin)),
+                 value(xmin)),
+             add(mul(varible(vector({make_pair(value(i), value(i + d))})),
+                     value(ymax - ymin)),
+                 value(ymin)));
+    // cout << "(" << i << ", " << j << ")" << v << endl;
+    point_status is = point_status::no;
+    for (auto it = v.ranges.begin(); it != v.ranges.end(); ++it) {
+      if (isInequality) {
+        if (value(0) <= it->first) {
+          is = point_status::yes;
+          break;
+        }
+        if (value(0) <= it->second) {
+          is = point_status::need_to_divide;
+#define add_sub()                                                              \
+  if (d > 1.0 / scr_size) {                                                    \
+    next_to_draw.push_back({i, j, d / 2});                                     \
+    if (i + d <= 1)                                                            \
+      next_to_draw.push_back({i + d / 2, j, d / 2});                           \
+    if (j + d <= 1)                                                            \
+      next_to_draw.push_back({i, j + d / 2, d / 2});                           \
+    if (i + d <= 1 && j + d <= 1)                                              \
+      next_to_draw.push_back({i + d / 2, j + d / 2, d / 2});                   \
+  }
+          add_sub();
+          break;
+        }
+      } else {
+        if (it->first <= 0 && value(0) <= it->second) {
+          is = point_status::need_to_divide;
+          add_sub();
+          break;
+        } else {
+          is = point_status::no;
+        }
+      }
+    }
+    /*
+    cout << i << ' ' << j << ' ' << d << " " << v << endl;
+    cout << i * (ymax - ymin) + ymin << ' ' << j * (xmax - xmin) + xmin << ' '
+         << d * (ymax - ymin) << " " << d * (xmax - xmin) << " " << v << endl;
+    */
+    for (int x = i * scr_size; x < min(1.0, i + d) * scr_size; ++x)
+      for (int y = j * scr_size; y < min(1.0, j + d) * scr_size; ++y) {
+        // auto [color0, color1, color2] = get_color(is, v.has_undefined);
+        // image[(x * scr_size + y) * 3 + 0] = color0;
+        // image[(x * scr_size + y) * 3 + 1] = color1;
+        // image[(x * scr_size + y) * 3 + 2] = color2;
+        status[x][y] = is;
+      }
+    return is != point_status::no;
+  };
+  string Sexpr;
+  expr_drawer(string sexpr, bool ine) {
+    expr = tokenize(sexpr);
+    need_to_draw.push_back({0, 0, 1});
+    isInequality = ine;
+    Sexpr = sexpr;
+  }
+  int id = 0;
+  bool done = false;
+  void process_one() {
+    if (done) {
+      return;
+    }
+    if (id == need_to_draw.size()) {
+      id = 0;
+      need_to_draw = next_to_draw;
+      next_to_draw.clear();
+      if (need_to_draw.size() == 0) {
+        done = true;
+        cout << "Done" << endl;
+      }
+      return;
+    }
+    if (status[get<0>(need_to_draw[id]) * scr_size]
+              [get<1>(need_to_draw[id]) * scr_size] ==
+        point_status::need_to_divide)
+      process(get<0>(need_to_draw[id]), get<1>(need_to_draw[id]),
+              get<2>(need_to_draw[id]));
+    ++id;
+  }
+};
+bool stop = false;
+void set_stop(int x) {
+  stop = true;
+  cout << "x: " << x << endl;
+}
 int main(int argc, char **argv) {
-  for (int i = 0; i < argc; i++) {
-    if (string(argv[i]) == "-i") {
-      isInequality = true;
-    }
-    if (string(argv[i]) == "-f" && i < argc - 1) {
-      filename = argv[i + 1];
-    }
-  }
-  if (filename == "") {
-    cout << "No filename specified" << endl;
-    return 1;
-  }
-  if (isInequality) {
-    cout << "inequality" << endl;
-  } else {
-    cout << "equation" << endl;
-  }
   if (!glfwInit()) {
     std::cerr << "Failed to initialize GLFW" << std::endl;
     return -1;
@@ -159,22 +245,10 @@ int main(int argc, char **argv) {
   glVertexAttribPointer(vTexCoordLocation, 2, GL_FLOAT, GL_FALSE,
                         4 * sizeof(GLfloat), (void *)(2 * sizeof(GLfloat)));
 
-  string sexpr;
-  {
-    if (filename == "-") {
-      getline(cin, sexpr);
-    } else {
-      ifstream f(filename);
-      getline(f, sexpr);
-    }
-  }
-
-  cin >> xmin >> xmax >> ymin >> ymax;
-  // xmin = ymin = -10;
-  // xmax = ymax = 10;
-  auto expr = tokenize(sexpr);
-  vector<vector<point_status>> status(
-      scr_size + 1, vector(scr_size + 1, point_status::need_to_divide));
+  // cin >> xmin >> xmax >> ymin >> ymax;
+  xmin = ymin = -10;
+  xmax = ymax = 10;
+  signal(SIGINT, set_stop);
   auto get_color =
       [](point_status is,
          bool undefined) -> tuple<unsigned char, unsigned char, unsigned char> {
@@ -194,136 +268,110 @@ int main(int argc, char **argv) {
       color0 = color2 = 0;
     }
     if (is != point_status::no) {
-      color2 = 128;
+      // color2 = 128;
+      color1 = 255; // g
+      color0 = color2 = 0;
     }
     return make_tuple(color0, color1, color2);
   };
-  vector<tuple<double, double, double>> next_to_draw;
-  next_to_draw.reserve(4);
-  auto process = [&](double i, double j, double d) {
-    if (status[i * scr_size][j * scr_size] == point_status::no)
-      return false;
-    if (status[i * scr_size][j * scr_size] == point_status::yes)
-      return true;
-    varible v =
-        eval(expr,
-             add(mul(varible(vector({make_pair(value(j), value(j + d))})),
-                     value(xmax - xmin)),
-                 value(xmin)),
-             add(mul(varible(vector({make_pair(value(i), value(i + d))})),
-                     value(ymax - ymin)),
-                 value(ymin)));
-    // cout << "(" << i << ", " << j << ")" << v << endl;
-    point_status is = point_status::no;
-    for (auto it = v.ranges.begin(); it != v.ranges.end(); ++it) {
-      if (isInequality) {
-        if (value(0) <= it->first) {
-          is = point_status::yes;
-          break;
-        }
-        if (value(0) <= it->second) {
-          is = point_status::need_to_divide;
-#define add_sub()                                                              \
-  next_to_draw.push_back({i, j, d / 2});                                       \
-  if (i + d <= 1)                                                              \
-    next_to_draw.push_back({i + d / 2, j, d / 2});                             \
-  if (j + d <= 1)                                                              \
-    next_to_draw.push_back({i, j + d / 2, d / 2});                             \
-  if (i + d <= 1 && j + d <= 1)                                                \
-    next_to_draw.push_back({i + d / 2, j + d / 2, d / 2});
-          add_sub();
-          break;
-        }
-      } else {
-        if (it->first <= 0 && value(0) <= it->second) {
-          is = point_status::need_to_divide;
-          add_sub();
-          break;
-        } else {
-          is = point_status::no;
-        }
-      }
-    }
-    cout << i << ' ' << j << ' ' << d << " " << v << endl;
-    cout << i * (ymax - ymin) + ymin << ' ' << j * (xmax - xmin) + xmin << ' '
-         << d * (ymax - ymin) << " " << d * (xmax - xmin) << " " << v << endl;
-    for (int x = i * scr_size; x < min(1.0, i + d) * scr_size; ++x)
-      for (int y = j * scr_size; y < min(1.0, j + d) * scr_size; ++y) {
-        auto [color0, color1, color2] = get_color(is, v.has_undefined);
-        image[(x * scr_size + y) * 3 + 0] = color0;
-        image[(x * scr_size + y) * 3 + 1] = color1;
-        image[(x * scr_size + y) * 3 + 2] = color2;
-        status[x][y] = is;
-      }
-    return is != point_status::no;
-  };
   bool done = false;
-  bool stop = false;
-  double delta = 0.5;
-  vector<tuple<double, double, double>> need_to_draw;
-  need_to_draw.push_back({0, 0, 1});
   auto it = 0;
+  vector<expr_drawer> draws;
+  int cur = 0;
   while (!glfwWindowShouldClose(window)) {
     glBindTexture(GL_TEXTURE_2D, texture);
-    bool done = false;
-    if (!stop) {
-      auto t = time(0);
-      for (int C = 0; C <
-#if 1
-                      max(need_to_draw.size(), (size_t)1) // 1
-#else
-                      1 // 0
-#endif
-           ;
-           ++C) {
-        if (time(0) - t >= 1) {
+    if (draws.size())
+      while (draws[cur].done) {
+        ++cur;
+        cur %= draws.size();
+        if (cur == 0)
           break;
-        }
-        if (it == need_to_draw.size()) {
-          done = true;
-          it = 0;
-          break;
-        }
-
-        if (status[get<0>(need_to_draw[it]) * scr_size]
-                  [get<1>(need_to_draw[it]) * scr_size] ==
-            point_status::need_to_divide) {
-          auto is = apply(process, need_to_draw[it]);
-        }
-
-        ++it;
       }
-      cout << it << "/" << need_to_draw.size() << endl;
-      if (done) {
-        // for (int i = 0; i < scr_size; ++i) {
-        //   for (int j = 0; j < scr_size; ++j) {
-        //     if (!no_for_sure[i][j])
-        //       image[(i * scr_size + j) * 3 + 0] =
-        //           image[(i * scr_size + j) * 3 + 1] =
-        //               image[(i * scr_size + j) * 3 + 2] = 0;
-        //   }
-        // }
-        delta /= 2;
-        if (delta < 0.5 / scr_size) {
-          stop = true;
-          for (int i = 0; i < scr_size; ++i) {
-            // x= v*(max-min)+min
-            auto x0 = -xmin / (xmax - xmin);
-            auto y0 = -ymin / (ymax - ymin);
-            if (0 <= x0 && x0 <= 1) {
-              image[(i * scr_size + int(x0 * scr_size)) * 3 + 0] = 128;
-            }
-            if (0 <= y0 && y0 <= 1) {
-              image[(int(y0 * scr_size) * scr_size + i) * 3 + 0] = 128;
-            }
+    if (cur == 0 && ((draws.size() == 1 && draws[0].done) || draws.size() != 1))
+      stop = true;
+    if (cur < draws.size())
+      for (int c = 0; c < max((size_t)1, draws[cur].need_to_draw.size()); ++c) {
+        draws[cur].process_one();
+      }
+
+    for (int i = 0; i < scr_size; ++i) {
+      for (int j = 0; j < scr_size; ++j) {
+        image[(i * scr_size + j) * 3 + 0] = image[(i * scr_size + j) * 3 + 1] =
+            image[(i * scr_size + j) * 3 + 2] = 0;
+      }
+    }
+    for (int c = 0; c < draws.size(); ++c)
+      for (int i = 0; i < scr_size; ++i) {
+        for (int j = 0; j < scr_size; ++j) {
+          bool v = (draws[c].status[i][j] != point_status::no);
+          if (v) {
+            image[(i * scr_size + j) * 3 + 0] = draws[c].c1;
+            image[(i * scr_size + j) * 3 + 1] = draws[c].c2;
+            image[(i * scr_size + j) * 3 + 2] = draws[c].c3;
           }
-          cout << "done." << endl;
         }
-        cout << delta << endl;
-        need_to_draw = next_to_draw;
-        next_to_draw.clear();
-        next_to_draw.reserve(need_to_draw.size());
       }
+
+    if (stop) {
+      cout << "Equation, Inequality, List, Setcolor, Delete, Quit" << endl;
+      char c;
+      cin >> c;
+      if (c == 'q')
+        break;
+      bool isineq = false;
+      switch (c) {
+      case 'i':
+        isineq = true;
+      case 'e': {
+        cout << " expr > ";
+        string sexpr;
+        getline(cin, sexpr); // eat the endl
+        getline(cin, sexpr);
+        cout << "color > ";
+        int c1, c2, c3;
+        cin >> c1 >> c2 >> c3;
+        draws.push_back(expr_drawer(sexpr, isineq));
+        draws.back().c1 = c1;
+        draws.back().c2 = c2;
+        draws.back().c3 = c3;
+      } break;
+      case 'l':
+        for (int i = 0; i < draws.size(); ++i) {
+          const auto &x = draws[i];
+          cout << i << ": "
+               << "expr: " << x.Sexpr << " color: ("
+               << ((unsigned int)x.c1 & 0xff) << ", "
+               << ((unsigned int)x.c2 & 0xff) << ", "
+               << ((unsigned int)x.c3 & 0xff) << ")" << endl;
+        }
+        break;
+      case 's': {
+        int i;
+        cout << "  id  >";
+        cin >> i;
+        if (i >= draws.size()) {
+          cout << i << ">=" << draws.size() << endl;
+          break;
+        }
+        cout << "color > ";
+        int c1, c2, c3;
+        cin >> c1 >> c2 >> c3;
+        draws[i].c1 = c1;
+        draws[i].c2 = c2;
+        draws[i].c3 = c3;
+      } break;
+      case 'd':
+        int i;
+        cout << "  id  >";
+        cin >> i;
+        if (i >= draws.size()) {
+          cout << i << ">=" << draws.size() << endl;
+          break;
+        }
+        draws.erase(draws.begin() + i);
+        break;
+      }
+      stop = false;
     }
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, scr_size, scr_size, 0, GL_RGB,
                  GL_UNSIGNED_BYTE, image.data());
