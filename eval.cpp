@@ -137,6 +137,8 @@ expression tokenize(const string &expr) {
       e.push_back({VAR1});
     } else if (c == 'y') {
       e.push_back({VAR2});
+    } else {
+      throw "";
     }
   }
   return e;

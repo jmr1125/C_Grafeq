@@ -73,29 +73,29 @@ CMakeFiles/testeval.dir/testeval.cpp.o: CMakeFiles/testeval.dir/flags.make
 CMakeFiles/testeval.dir/testeval.cpp.o: /Users/jiang/desktop/C_GrafEq/testeval.cpp
 CMakeFiles/testeval.dir/testeval.cpp.o: CMakeFiles/testeval.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/jiang/Desktop/C_GrafEq/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/testeval.dir/testeval.cpp.o"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/testeval.dir/testeval.cpp.o -MF CMakeFiles/testeval.dir/testeval.cpp.o.d -o CMakeFiles/testeval.dir/testeval.cpp.o -c /Users/jiang/desktop/C_GrafEq/testeval.cpp
+	/opt/homebrew/opt/llvm/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/testeval.dir/testeval.cpp.o -MF CMakeFiles/testeval.dir/testeval.cpp.o.d -o CMakeFiles/testeval.dir/testeval.cpp.o -c /Users/jiang/desktop/C_GrafEq/testeval.cpp
 
 CMakeFiles/testeval.dir/testeval.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/testeval.dir/testeval.cpp.i"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/jiang/desktop/C_GrafEq/testeval.cpp > CMakeFiles/testeval.dir/testeval.cpp.i
+	/opt/homebrew/opt/llvm/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/jiang/desktop/C_GrafEq/testeval.cpp > CMakeFiles/testeval.dir/testeval.cpp.i
 
 CMakeFiles/testeval.dir/testeval.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/testeval.dir/testeval.cpp.s"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/jiang/desktop/C_GrafEq/testeval.cpp -o CMakeFiles/testeval.dir/testeval.cpp.s
+	/opt/homebrew/opt/llvm/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/jiang/desktop/C_GrafEq/testeval.cpp -o CMakeFiles/testeval.dir/testeval.cpp.s
 
 CMakeFiles/testeval.dir/eval.cpp.o: CMakeFiles/testeval.dir/flags.make
 CMakeFiles/testeval.dir/eval.cpp.o: /Users/jiang/desktop/C_GrafEq/eval.cpp
 CMakeFiles/testeval.dir/eval.cpp.o: CMakeFiles/testeval.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/jiang/Desktop/C_GrafEq/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/testeval.dir/eval.cpp.o"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/testeval.dir/eval.cpp.o -MF CMakeFiles/testeval.dir/eval.cpp.o.d -o CMakeFiles/testeval.dir/eval.cpp.o -c /Users/jiang/desktop/C_GrafEq/eval.cpp
+	/opt/homebrew/opt/llvm/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/testeval.dir/eval.cpp.o -MF CMakeFiles/testeval.dir/eval.cpp.o.d -o CMakeFiles/testeval.dir/eval.cpp.o -c /Users/jiang/desktop/C_GrafEq/eval.cpp
 
 CMakeFiles/testeval.dir/eval.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/testeval.dir/eval.cpp.i"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/jiang/desktop/C_GrafEq/eval.cpp > CMakeFiles/testeval.dir/eval.cpp.i
+	/opt/homebrew/opt/llvm/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/jiang/desktop/C_GrafEq/eval.cpp > CMakeFiles/testeval.dir/eval.cpp.i
 
 CMakeFiles/testeval.dir/eval.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/testeval.dir/eval.cpp.s"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/jiang/desktop/C_GrafEq/eval.cpp -o CMakeFiles/testeval.dir/eval.cpp.s
+	/opt/homebrew/opt/llvm/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/jiang/desktop/C_GrafEq/eval.cpp -o CMakeFiles/testeval.dir/eval.cpp.s
 
 # Object files for target testeval
 testeval_OBJECTS = \

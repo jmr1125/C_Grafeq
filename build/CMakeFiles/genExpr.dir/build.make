@@ -73,15 +73,15 @@ CMakeFiles/genExpr.dir/genexpr.cpp.o: CMakeFiles/genExpr.dir/flags.make
 CMakeFiles/genExpr.dir/genexpr.cpp.o: /Users/jiang/desktop/C_GrafEq/genexpr.cpp
 CMakeFiles/genExpr.dir/genexpr.cpp.o: CMakeFiles/genExpr.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/jiang/Desktop/C_GrafEq/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/genExpr.dir/genexpr.cpp.o"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/genExpr.dir/genexpr.cpp.o -MF CMakeFiles/genExpr.dir/genexpr.cpp.o.d -o CMakeFiles/genExpr.dir/genexpr.cpp.o -c /Users/jiang/desktop/C_GrafEq/genexpr.cpp
+	/opt/homebrew/opt/llvm/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/genExpr.dir/genexpr.cpp.o -MF CMakeFiles/genExpr.dir/genexpr.cpp.o.d -o CMakeFiles/genExpr.dir/genexpr.cpp.o -c /Users/jiang/desktop/C_GrafEq/genexpr.cpp
 
 CMakeFiles/genExpr.dir/genexpr.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/genExpr.dir/genexpr.cpp.i"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/jiang/desktop/C_GrafEq/genexpr.cpp > CMakeFiles/genExpr.dir/genexpr.cpp.i
+	/opt/homebrew/opt/llvm/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/jiang/desktop/C_GrafEq/genexpr.cpp > CMakeFiles/genExpr.dir/genexpr.cpp.i
 
 CMakeFiles/genExpr.dir/genexpr.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/genExpr.dir/genexpr.cpp.s"
-	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/jiang/desktop/C_GrafEq/genexpr.cpp -o CMakeFiles/genExpr.dir/genexpr.cpp.s
+	/opt/homebrew/opt/llvm/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/jiang/desktop/C_GrafEq/genexpr.cpp -o CMakeFiles/genExpr.dir/genexpr.cpp.s
 
 # Object files for target genExpr
 genExpr_OBJECTS = \
