@@ -1,6 +1,7 @@
 
 #include "eval.h"
 #include <algorithm>
+#include <atomic>
 #include <bitset>
 #include <list>
 #include <mutex>
@@ -58,7 +59,7 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action,
   if (action == GLFW_PRESS && key == GLFW_KEY_ESCAPE)
     glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
-int scr_size = 512;
+int scr_size = 512, scr_size_dep = 9;
 double xmin, xmax, ymin, ymax;
 enum class point_status { need_to_divide = 0, no, yes };
 struct range2 {
@@ -92,9 +93,10 @@ struct range2 {
     return make_pair(make_pair(x - d, x + d), make_pair(y - d, y + d));
   }
   bool operator<(const range2 &rsh) const {
-    auto [x1, y1, d1] = to_xyd();
-    auto [x2, y2, d2] = rsh.to_xyd();
-    return make_tuple(d1, x1, y1) < make_tuple(d2, x2, y2);
+    // auto [x1, y1, d1] = to_xyd();
+    // auto [x2, y2, d2] = rsh.to_xyd();
+    // return make_tuple(d1, x1, y1) < make_tuple(d2, x2, y2);
+    return r.size() > rsh.r.size();
     // return lexicographical_compare(r.begin(), r.end(), rsh.r.begin(),
     //                                rsh.r.end(),
     //                                [](const bitset<2> &a, const bitset<2> &b)
@@ -109,8 +111,8 @@ struct expr_drawer {
   bool isInequality;
   mutex need_to_draw_m;
   priority_queue<range2> need_to_draw;
-  vector<vector<point_status>> status =
-      vector(scr_size + 1, vector(scr_size + 1, point_status::need_to_divide));
+  vector<vector<point_status>> status;
+  vector<vector<atomic<double>>> prec;
   // vector<tuple<double, double, double>> next_to_draw;
   char c1, c2, c3;
   bool process(const range2 &r // double i, double j, double d
@@ -144,18 +146,8 @@ struct expr_drawer {
     auto r1 = r;                                                               \
     r1.r.push_back(0);                                                         \
     if (d > 1.0 / scr_size) {                                                  \
-      r1.r.back() = 0;                                                         \
-      need_to_draw.push(r1);                                                   \
-      if (i + d <= 1) {                                                        \
-        r1.r.back() = 1;                                                       \
-        need_to_draw.push(r1);                                                 \
-      }                                                                        \
-      if (j + d <= 1) {                                                        \
-        r1.r.back() = 2;                                                       \
-        need_to_draw.push(r1);                                                 \
-      }                                                                        \
-      if (i + d <= 1 && j + d <= 1) {                                          \
-        r1.r.back() = 3;                                                       \
+      for (int i = 0; i < 4; ++i) {                                            \
+        r1.r.back() = i;                                                       \
         need_to_draw.push(r1);                                                 \
       }                                                                        \
     }                                                                          \
@@ -178,16 +170,31 @@ struct expr_drawer {
     cout << i * (ymax - ymin) + ymin << ' ' << j * (xmax - xmin) + xmin << ' '
          << d * (ymax - ymin) << " " << d * (xmax - xmin) << " " << v << endl;
     */
-    for (int x = i * scr_size; x < min(1.0, i + d) * scr_size; ++x)
-      for (int y = j * scr_size; y < min(1.0, j + d) * scr_size; ++y) {
-        // auto [color0, color1, color2] = get_color(is, v.has_undefined);
-        // image[(x * scr_size + y) * 3 + 0] = color0;
-        // image[(x * scr_size + y) * 3 + 1] = color1;
-        // image[(x * scr_size + y) * 3 + 2] = color2;
-        // cout << "(" << x << "," << y << ")" << (is == point_status::yes)
-        //      << (is == point_status::no);
-        status[x][y] = is;
-      }
+    {
+      range2 r1 = r;
+      if (r1.r.size() > scr_size_dep)
+        r1.r.resize(scr_size_dep, 0);
+      auto [I, J, D] = r1.to_xyd();
+      for (int x = I * scr_size; x < (I + D) * scr_size; ++x)
+        for (int y = J * scr_size; y < (J + D) * scr_size; ++y) {
+          // auto [color0, color1, color2] = get_color(is, v.has_undefined);
+          // image[(x * scr_size + y) * 3 + 0] = color0;
+          // image[(x * scr_size + y) * 3 + 1] = color1;
+          // image[(x * scr_size + y) * 3 + 2] = color2;
+          // cout << "(" << x << "," << y << ")" << (is == point_status::yes)
+          //      << (is == point_status::no);
+          // if (status[x][y] == point_status::no ||
+          //     status[x][y] == point_status::yes)
+          //   continue; // other thread has wroted
+          {
+            auto D1 = d;
+            while (prec[x][y].compare_exchange_weak(D1, D1 / 2)) {
+              D1 = d;
+            }
+            status[x][y] = is;
+          }
+        }
+    }
     done = false;
     return is != point_status::no;
   };
@@ -195,6 +202,15 @@ struct expr_drawer {
   expr_drawer(string sexpr, bool ine) {
     lock_guard l(need_to_draw_m);
     expr = tokenize(sexpr);
+    status = vector(scr_size + 1,
+                    vector(scr_size + 1, point_status::need_to_divide));
+    prec.resize(scr_size + 1);
+    for (auto &t : prec) {
+      t = vector<atomic<double>>(scr_size + 1);
+      for (auto &u : t) {
+        u = 1;
+      }
+    }
     need_to_draw.push({0, 0, 0});
     isInequality = ine;
     Sexpr = sexpr;
@@ -237,7 +253,7 @@ bool stop = false;
 void set_stop(int x) {
   stop = true;
   cout << "x: " << x << endl;
-}
+} //   xv 30 mSv 0.2 mv 0.4 ays
 int main(int argc, char **argv) {
   if (!glfwInit()) {
     std::cerr << "Failed to initialize GLFW" << std::endl;
