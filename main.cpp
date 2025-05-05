@@ -96,7 +96,9 @@ struct range2 {
     // auto [x1, y1, d1] = to_xyd();
     // auto [x2, y2, d2] = rsh.to_xyd();
     // return make_tuple(d1, x1, y1) < make_tuple(d2, x2, y2);
-    return r.size() > rsh.r.size();
+    return (r.size() > rsh.r.size()) ||
+           (r.size() == rsh.r.size() &&
+            r.back().to_ulong() > rsh.r.back().to_ulong());
     // return lexicographical_compare(r.begin(), r.end(), rsh.r.begin(),
     //                                rsh.r.end(),
     //                                [](const bitset<2> &a, const bitset<2> &b)
@@ -109,14 +111,48 @@ struct range2 {
 struct expr_drawer {
   expression expr;
   bool isInequality;
-  mutex need_to_draw_m;
+  mutex need_to_draw_m, prec_m;
   priority_queue<range2> need_to_draw;
   vector<vector<point_status>> status;
-  vector<vector<atomic<double>>> prec;
+  vector<vector<atomic<int>>> prec;
+  vector<vector<atomic<int>>> root_count;
   // vector<tuple<double, double, double>> next_to_draw;
   char c1, c2, c3;
   bool process(const range2 &r // double i, double j, double d
   ) {
+    if (!isInequality) {
+      range2 r1 = r;
+      if (r1.r.size() > scr_size_dep)
+        r1.r.resize(scr_size_dep, 0);
+      auto [I, J, D] = r1.to_xyd();
+      for (int x = I * scr_size; x < (I + D) * scr_size; ++x)
+        for (int y = J * scr_size; y < (J + D) * scr_size; ++y) {
+          // auto [color0, color1, color2] = get_color(is, v.has_undefined);
+          // image[(x * scr_size + y) * 3 + 0] = color0;
+          // image[(x * scr_size + y) * 3 + 1] = color1;
+          // image[(x * scr_size + y) * 3 + 2] = color2;
+          // cout << "(" << x << "," << y << ")" << (is == point_status::yes)
+          //      << (is == point_status::no);
+          // if (status[x][y] == point_status::no ||
+          //     status[x][y] == point_status::yes)
+          //   continue; // other thread has wroted
+          while (true) {
+            bool out = false;
+            do {
+              lock_guard l(prec_m);
+              if (prec[x][y] < r1.r.size()) {
+                break;
+              }
+              root_count[x][y]--;
+              out = true;
+            } while (0);
+            if (out) {
+              break;
+            }
+            this_thread::yield();
+          }
+        }
+    }
     auto [i, j, d] = r.to_xyd();
     // if (status[i * scr_size][j * scr_size] == point_status::no)
     //   return false;
@@ -131,6 +167,18 @@ struct expr_drawer {
                      value(ymax - ymin)),
                  value(ymin)));
     // cout << "(" << i << ", " << j << ")" << v << ' ' << d << endl;
+#define add_sub()                                                              \
+  {                                                                            \
+    lock_guard lock(need_to_draw_m);                                           \
+    auto r1 = r;                                                               \
+    r1.r.push_back(0);                                                         \
+    if (d > 1.0 / scr_size / 16) {                                             \
+      for (int i = 0; i < 4; ++i) {                                            \
+        r1.r.back() = i;                                                       \
+        need_to_draw.push(r1);                                                 \
+      }                                                                        \
+    }                                                                          \
+  }
     point_status is = point_status::no;
     for (auto it = v.ranges.begin(); it != v.ranges.end(); ++it) {
       if (isInequality) {
@@ -140,23 +188,47 @@ struct expr_drawer {
         }
         if (value(0) <= it->second) {
           is = point_status::need_to_divide;
-#define add_sub()                                                              \
-  {                                                                            \
-    lock_guard lock(need_to_draw_m);                                           \
-    auto r1 = r;                                                               \
-    r1.r.push_back(0);                                                         \
-    if (d > 1.0 / scr_size) {                                                  \
-      for (int i = 0; i < 4; ++i) {                                            \
-        r1.r.back() = i;                                                       \
-        need_to_draw.push(r1);                                                 \
-      }                                                                        \
-    }                                                                          \
-  }
           add_sub();
           break;
         }
-      } else {
+      } else { // equation
         if (it->first <= value(0) && value(0) <= it->second) {
+          for (int s = 0; s < 4; ++s) {
+            range2 r1 = r;
+            r1.r.push_back(s);
+            if (r1.r.size() > scr_size_dep)
+              r1.r.resize(scr_size_dep, 0);
+            auto [I, J, D] = r1.to_xyd();
+            for (int x = I * scr_size; x < (I + D) * scr_size; ++x)
+              for (int y = J * scr_size; y < (J + D) * scr_size; ++y) {
+                // auto [color0, color1, color2] = get_color(is,
+                // v.has_undefined); image[(x * scr_size + y) * 3 + 0] = color0;
+                // image[(x * scr_size + y) * 3 + 1] = color1;
+                // image[(x * scr_size + y) * 3 + 2] = color2;
+                // cout << "(" << x << "," << y << ")" << (is ==
+                // point_status::yes)
+                //      << (is == point_status::no);
+                // if (status[x][y] == point_status::no ||
+                //     status[x][y] == point_status::yes)
+                //   continue; // other thread has wroted
+
+                while (true) {
+                  bool out = false;
+                  do {
+                    lock_guard l(prec_m);
+                    if (prec[x][y] < r1.r.size() - 1) {
+                      break;
+                    }
+                    root_count[x][y]++;
+                    out = true;
+                  } while (0);
+                  if (out) {
+                    break;
+                  }
+                  this_thread::yield();
+                }
+              }
+          }
           is = point_status::need_to_divide;
           add_sub();
           break;
@@ -186,12 +258,21 @@ struct expr_drawer {
           // if (status[x][y] == point_status::no ||
           //     status[x][y] == point_status::yes)
           //   continue; // other thread has wroted
-          {
-            auto D1 = d;
-            while (prec[x][y].compare_exchange_weak(D1, D1 / 2)) {
-              D1 = d;
+          while (true) {
+            bool out = false;
+            do {
+              lock_guard l(prec_m);
+              if (prec[x][y] < r1.r.size()) {
+                break;
+              }
+              prec[x][y] = r1.r.size() + 1;
+              status[x][y] = is;
+              out = true;
+            } while (0);
+            if (out) {
+              break;
             }
-            status[x][y] = is;
+            this_thread::yield();
           }
         }
     }
@@ -204,11 +285,20 @@ struct expr_drawer {
     expr = tokenize(sexpr);
     status = vector(scr_size + 1,
                     vector(scr_size + 1, point_status::need_to_divide));
+    if (!ine) {
+      root_count.resize(scr_size + 1);
+      for (auto &t : root_count) {
+        t = vector<atomic<int>>(scr_size + 1);
+        for (auto &u : t) {
+          u = 1;
+        }
+      }
+    }
     prec.resize(scr_size + 1);
     for (auto &t : prec) {
-      t = vector<atomic<double>>(scr_size + 1);
+      t = vector<atomic<int>>(scr_size + 1);
       for (auto &u : t) {
-        u = 1;
+        u = 0;
       }
     }
     need_to_draw.push({0, 0, 0});
@@ -417,7 +507,12 @@ int main(int argc, char **argv) {
     for (int c = 0; c < draws.size(); ++c)
       for (int i = 0; i < scr_size; ++i) {
         for (int j = 0; j < scr_size; ++j) {
-          bool v = (draws.at(c)->status[i][j] != point_status::no);
+          bool v;
+          if (draws.at(c)->isInequality) {
+            v = (draws.at(c)->status[i][j] != point_status::no);
+          } else {
+            v = draws.at(c)->root_count[i][j];
+          }
           if (v) {
             image[(i * scr_size + j) * 3 + 0] = draws[c]->c1;
             image[(i * scr_size + j) * 3 + 1] = draws[c]->c2;
