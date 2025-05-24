@@ -2,9 +2,11 @@
 #include "eval.h"
 #include <algorithm>
 #include <atomic>
-#include <bitset>
+#include <cstddef>
+#include <cstdio>
 #include <list>
 #include <mutex>
+#include <ostream>
 #include <queue>
 #include <utility>
 #define GL_SILENCE_DEPRECATION
@@ -67,8 +69,10 @@ struct range2 {
   range2(double x, double y, int n) {
     r.resize(n);
     for (int i = 0; i < n; ++i) {
-      r[i][0] = (x >= 1);
-      r[i][1] = (y >= 1);
+      if (y >= 1)
+        r[i] += 1;
+      if (y >= 1)
+        r[i] += 2;
       x *= 2;
       y *= 2;
     }
@@ -79,10 +83,10 @@ struct range2 {
     double x = 0, y = 0;
     for (const auto &t : r) {
       d /= 2;
-      if (t[0]) {
+      if (t & 1) {
         x += d;
       }
-      if (t[1]) {
+      if (t & 2) {
         y += d;
       }
     }
@@ -93,12 +97,40 @@ struct range2 {
     return make_pair(make_pair(x - d, x + d), make_pair(y - d, y + d));
   }
   bool operator<(const range2 &rsh) const {
+    if (r.size() <= scr_size_dep && rsh.r.size() <= scr_size_dep) {
+      if (r.size() > rsh.r.size())
+        return true;
+      if (r.size() < rsh.r.size())
+        return false;
+    }
+    size_t len = min((size_t)scr_size_dep, r.size());
+    auto r_rbegin = std::make_reverse_iterator(r.begin() + len);
+    auto r_rend = std::make_reverse_iterator(r.begin());
+
+    auto rsh_rbegin = std::make_reverse_iterator(rsh.r.begin() + len);
+    auto rsh_rend = std::make_reverse_iterator(rsh.r.begin());
+    if (!equal(r_rbegin, r_rend, rsh_rbegin))
+      return std::lexicographical_compare(r_rbegin, r_rend, rsh_rbegin,
+                                          rsh_rend);
+
+    if (r.size() > rsh.r.size())
+      return true;
+    else
+      return false;
     // auto [x1, y1, d1] = to_xyd();
     // auto [x2, y2, d2] = rsh.to_xyd();
     // return make_tuple(d1, x1, y1) < make_tuple(d2, x2, y2);
-    return (r.size() > rsh.r.size()) ||
-           (r.size() == rsh.r.size() &&
-            r.back().to_ulong() > rsh.r.back().to_ulong());
+    // return (r.size() > rsh.r.size()) ||
+    //        (r.size() == rsh.r.size() &&
+    //         lexicographical_compare(
+    //             r.rbegin(), r.rbegin() + min((int)r.size(), scr_size_dep),
+    //             rsh.r.rbegin(),
+    //             rsh.r.rbegin() + min((int)rsh.r.size(), scr_size_dep),
+    //             [](const bitset<2> &a, const bitset<2> &b) {
+    //               return a.to_ulong() < b.to_ulong();
+    //             })
+    //         // r.back().to_ulong() > rsh.r.back().to_ulong()
+    //        );
     // return lexicographical_compare(r.begin(), r.end(), rsh.r.begin(),
     //                                rsh.r.end(),
     //                                [](const bitset<2> &a, const bitset<2> &b)
@@ -106,7 +138,7 @@ struct range2 {
     //                                  return a.to_ulong() < b.to_ulong();
     //                                });
   }
-  vector<bitset<2>> r;
+  vector<char> r;
 };
 struct expr_drawer {
   expression expr;
@@ -172,11 +204,9 @@ struct expr_drawer {
     lock_guard lock(need_to_draw_m);                                           \
     auto r1 = r;                                                               \
     r1.r.push_back(0);                                                         \
-    if (d > 1.0 / scr_size / 16) {                                             \
-      for (int i = 0; i < 4; ++i) {                                            \
-        r1.r.back() = i;                                                       \
-        need_to_draw.push(r1);                                                 \
-      }                                                                        \
+    for (int i = 0; i < 4; ++i) {                                              \
+      r1.r.back() = i;                                                         \
+      need_to_draw.push(r1);                                                   \
     }                                                                          \
   }
     point_status is = point_status::no;
@@ -188,7 +218,9 @@ struct expr_drawer {
         }
         if (value(0) <= it->second) {
           is = point_status::need_to_divide;
-          add_sub();
+          if (d > 1.0 / scr_size) {
+            add_sub();
+          }
           break;
         }
       } else { // equation
@@ -230,7 +262,28 @@ struct expr_drawer {
               }
           }
           is = point_status::need_to_divide;
-          add_sub();
+          if (d > 1.0 / scr_size / 64) {
+            add_sub();
+          } // else if (d > 1.0 / scr_size / 64) {
+          //   auto r1 = r;
+          //   if (r1.r.size() > scr_size_dep)
+          //     r1.r.resize(scr_size_dep, 0);
+          //   auto [I, J, D] = r1.to_xyd();
+          //   if (D != 1.0 / scr_size) {
+          //     cout << "?";
+          //   }
+          //   int x0 = I * scr_size, y0 = J * scr_size;
+          //   int c = 0;
+          //   for (int dx = -1; dx <= 1; ++dx) {
+          //     for (int dy = -1; dy <= 1; ++dy) {
+          //       if (0 <= x0 + dx && x0 + dx <= scr_size && 0 <= y0 + dy &&
+          //           y0 + dy <= scr_size && root_count[x0 + dx][y0 + dy])
+          //         c++;
+          //     }
+          //   }
+          //   if (c > 4)
+          //     add_sub();
+          // }
           break;
         } else {
           is = point_status::no;
@@ -280,7 +333,7 @@ struct expr_drawer {
     return is != point_status::no;
   };
   string Sexpr;
-  expr_drawer(string sexpr, bool ine) {
+  expr_drawer(string sexpr, bool ine, bool meticulous = false) {
     lock_guard l(need_to_draw_m);
     expr = tokenize(sexpr);
     status = vector(scr_size + 1,
@@ -298,10 +351,26 @@ struct expr_drawer {
     for (auto &t : prec) {
       t = vector<atomic<int>>(scr_size + 1);
       for (auto &u : t) {
-        u = 0;
+        if (meticulous) {
+          u = scr_size_dep;
+        } else {
+          u = 0;
+        }
       }
     }
-    need_to_draw.push({0, 0, 0});
+    if (!meticulous) {
+      need_to_draw.push({0, 0, 0});
+    } else {
+      for (long long i = 0; i < (1 << (2 * scr_size_dep)); ++i) {
+        range2 r;
+        r.r.resize(scr_size_dep);
+        for (int x = 0; x < scr_size_dep; ++x) {
+          r.r[x] = (i >> (x * 2)) & 3;
+        }
+        need_to_draw.push(r);
+        // cout << i << ' ' << (1 << (2 * scr_size_dep)) << endl;
+      }
+    }
     isInequality = ine;
     Sexpr = sexpr;
   }
@@ -316,7 +385,7 @@ struct expr_drawer {
       lock_guard l(need_to_draw_m);
       if (need_to_draw.size() == 0) {
         done = true;
-        cout << "Done" << endl;
+        cerr << "Done" << endl;
         return;
       }
       // if (id == need_to_draw.size()) {
@@ -342,8 +411,8 @@ struct expr_drawer {
 bool stop = false;
 void set_stop(int x) {
   stop = true;
-  cout << "x: " << x << endl;
-} //   xv 30 mSv 0.2 mv 0.4 ays
+  cerr << "x: " << x << endl;
+} // example expr   xv 30 mSv 0.2 mv 0.4 ays
 int main(int argc, char **argv) {
   if (!glfwInit()) {
     std::cerr << "Failed to initialize GLFW" << std::endl;
@@ -428,10 +497,10 @@ int main(int argc, char **argv) {
                         4 * sizeof(GLfloat), (void *)(2 * sizeof(GLfloat)));
 
   // cin >> xmin >> xmax >> ymin >> ymax;
-  // xmin = ymin = -10;
-  // xmax = ymax = 10;
-  xmin = ymin = 0; // for six.exp
-  xmax = ymax = 1;
+  xmin = ymin = -10;
+  xmax = ymax = 10;
+  // xmin = ymin = 0; // for six.exp
+  // xmax = ymax = 1;
   // xmin = -8.61425; for xlcp.exp
   // xmax = -6.857;
   // ymin = -7.02332031125;
@@ -466,28 +535,43 @@ int main(int argc, char **argv) {
   auto it = 0;
   vector<shared_ptr<expr_drawer>> draws;
   int cur = 0;
+  // cout << "YUV4MPEG2 W" << scr_size << " H" << scr_size << " F25:1 Ip A0:0";
+  printf("YUV4MPEG2 W%d H%d F25:1 Ip A0:0 C444", scr_size, scr_size);
+  putchar(10);
   while (!glfwWindowShouldClose(window)) {
     glBindTexture(GL_TEXTURE_2D, texture);
-    if (draws.size())
+    if (draws.size()) {
+      ++cur;
+      cur %= draws.size();
       while (draws.at(cur)->done) {
         ++cur;
         cur %= draws.size();
         if (cur == 0)
           break;
       }
-    if (cur == 0 &&
-        ((draws.size() == 1 && draws.at(0)->done) || draws.size() != 1))
+    }
+    // if (cur == 0 &&
+    //     ((draws.size() == 1 && draws.at(0)->done) || draws.size() != 1))
+    if (all_of(draws.begin(), draws.end(),
+               [](shared_ptr<expr_drawer> x) { return x->done; }))
       stop = true;
     if (cur < draws.size()) {
       vector<thread> ths;
-      cout << cur << " : ";
-      for (const auto &x : draws[cur]->need_to_draw.top().r) {
-        cout << x.to_ullong();
+      cerr << cur << " : ";
+      {
+        int i = 0;
+        for (const auto &x : draws[cur]->need_to_draw.top().r) {
+          cerr << (int)x;
+          if ((++i) == scr_size_dep)
+            cerr << " ";
+        }
       }
-      cout << endl;
-      for (int i = 0; i < 8; ++i) {
+      cerr << "\r" << flush;
+      int tot = 1024;
+      int thread_num = 3; // thread::hardware_concurrency();
+      for (int i = 0; i < thread_num; ++i) {
         ths.push_back(thread([&, i] {
-          for (int c = 0; c < 64 && !stop; ++c) {
+          for (int c = 0; c < tot / thread_num && !stop; ++c) {
             // cout << i << ' ' << c << endl;
             draws.at(cur)->process_one();
           }
@@ -497,7 +581,7 @@ int main(int argc, char **argv) {
         t.join();
     }
     if (draws.size() > cur)
-      cout << draws.at(cur)->need_to_draw.size() << endl;
+      cerr << draws.at(cur)->need_to_draw.size() << " calc left   ";
     for (int i = 0; i < scr_size; ++i) {
       for (int j = 0; j < scr_size; ++j) {
         image[(i * scr_size + j) * 3 + 0] = image[(i * scr_size + j) * 3 + 1] =
@@ -526,9 +610,30 @@ int main(int argc, char **argv) {
           // }
         }
       }
+    if (!stop) {
+      // cout << char(10);
+      // cout << "FRAME" << char(10) << flush;
+      printf("FRAME");
+      putchar(10);
+      for (int c = 0; c < 3; ++c)
+        for (int i = 0; i < scr_size; ++i) {
+          // cerr << i << ' ';
+          for (int j = 0; j < scr_size; ++j) {
+            int r = image[(i * scr_size + j) * 3 + 0],
+                g = image[(i * scr_size + j) * 3 + 1],
+                b = image[(i * scr_size + j) * 3 + 2];
+            int y = 16 + (65.738 * r + 129.057 * g + 25.064 * b) / 256,
+                u = 128 + (-37.945 * r - 74.494 * g + 112.439 * b) / 256,
+                v = 128 + (112.439 * r - 94.154 * g - 18.285 * b) / 256;
+            int yuv[] = {y, u, v};
+            putchar(yuv[c]);
+          }
+        }
+    }
 
     if (stop) {
-      cout << "Equation, Inequality, List, Setcolor, Delete, Quit" << endl;
+      cerr << endl
+           << "Equation, Inequality, List, Setcolor, Delete, Quit" << endl;
       cin.clear();
       char c;
       cin >> c;
@@ -539,31 +644,35 @@ int main(int argc, char **argv) {
       case 'i':
         isineq = true;
       case 'e': {
-        cout << " expr > ";
+        cerr << " expr > ";
         string sexpr;
         getline(cin, sexpr); // eat the endl
         getline(cin, sexpr);
         if (sexpr[0] == 'F') {
           ifstream e(sexpr.substr(1));
-          cout << "reading " << sexpr.substr(1) << endl;
+          cerr << "reading " << sexpr.substr(1) << endl;
           sexpr = "";
           do {
             sexpr += e.get();
           } while (e);
           sexpr.erase(sexpr.size() - 1);
         }
-        cout << "color > ";
+        cerr << "color > ";
         int c1, c2, c3;
         cin >> c1 >> c2 >> c3;
-        draws.push_back(make_shared<expr_drawer>(sexpr, isineq));
+        cerr << "start meticulous? >";
+        int f;
+        cin >> f;
+        draws.push_back(make_shared<expr_drawer>(sexpr, isineq, f));
         draws.back()->c1 = c1;
         draws.back()->c2 = c2;
         draws.back()->c3 = c3;
+        cerr << "start" << endl << endl;
       } break;
       case 'l':
         for (int i = 0; i < draws.size(); ++i) {
           const auto &x = draws.at(i);
-          cout << i << ": "
+          cerr << i << ": "
                << "expr: " << x->Sexpr << " color: ("
                << ((unsigned int)x->c1 & 0xff) << ", "
                << ((unsigned int)x->c2 & 0xff) << ", "
@@ -572,13 +681,13 @@ int main(int argc, char **argv) {
         break;
       case 's': {
         int i;
-        cout << "  id  >";
+        cerr << "  id  >";
         cin >> i;
         if (i >= draws.size()) {
-          cout << i << ">=" << draws.size() << endl;
+          cerr << i << ">=" << draws.size() << endl;
           break;
         }
-        cout << "color > ";
+        cerr << "color > ";
         int c1, c2, c3;
         cin >> c1 >> c2 >> c3;
         draws.at(i)->c1 = c1;
@@ -587,10 +696,10 @@ int main(int argc, char **argv) {
       } break;
       case 'd':
         int i;
-        cout << "  id  >";
+        cerr << "  id  >";
         cin >> i;
         if (i >= draws.size()) {
-          cout << i << ">=" << draws.size() << endl;
+          cerr << i << ">=" << draws.size() << endl;
           break;
         }
         draws.erase(draws.begin() + i);
