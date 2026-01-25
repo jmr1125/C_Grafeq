@@ -1,25 +1,92 @@
+#include <memory>
 #include <ostream>
 #include <utility>
 #include <vector>
 using std::pair;
+using std::shared_ptr;
 using std::vector;
-enum OP {
-  ADD,     // a
-  SUB,     // s
-  MUL,     // m
-  DIV,     // d
-  POW,     // p
-  LOG,     // l
-  SIN,     // S
-  COS,     // C
-  TAN,     // T
-  VAR1,    // x
-  VAR2,    // y
-  CONSTANT // v
+// enum OP {
+//   ADD,     // a
+//   SUB,     // s
+//   MUL,     // m
+//   DIV,     // d
+//   POW,     // p
+//   LOG,     // l
+//   SIN,     // S
+//   COS,     // C
+//   TAN,     // T
+//   VAR1,    // x
+//   VAR2,    // y
+//   CONSTANT // v
+// };
+// struct term {
+//   OP op;
+//   double constant;
+// };
+struct varible;
+struct expression {
+  virtual int eval(const varible &x, const varible &y,
+                   const vector<shared_ptr<expression>> &exprs) const = 0;
+  virtual ~expression() = default;
+  vector<shared_ptr<expression>> exprs;
 };
-struct term {
-  OP op;
-  double constant;
+struct ADD : public expression {
+  virtual int eval(const varible &x, const varible &y,
+                   const vector<shared_ptr<expression>> &exprs) const = 0;
+  int l, r;
+};
+struct SUB : public expression {
+  virtual int eval(const varible &x, const varible &y,
+                   const vector<shared_ptr<expression>> &exprs) const = 0;
+  int l, r;
+};
+struct MUL : public expression {
+  virtual int eval(const varible &x, const varible &y,
+                   const vector<shared_ptr<expression>> &exprs) const = 0;
+  int l, r;
+};
+struct DIV : public expression {
+  virtual int eval(const varible &x, const varible &y,
+                   const vector<shared_ptr<expression>> &exprs) const = 0;
+  int l, r;
+};
+struct POW : public expression {
+  virtual int eval(const varible &x, const varible &y,
+                   const vector<shared_ptr<expression>> &exprs) const = 0;
+  int l, r;
+};
+struct LOG : public expression {
+  virtual int eval(const varible &x, const varible &y,
+                   const vector<shared_ptr<expression>> &exprs) const = 0;
+  int l;
+};
+struct SIN : public expression {
+  virtual int eval(const varible &x, const varible &y,
+                   const vector<shared_ptr<expression>> &exprs) const = 0;
+  int l;
+};
+struct COS : public expression {
+  virtual int eval(const varible &x, const varible &y,
+                   const vector<shared_ptr<expression>> &exprs) const = 0;
+  int l;
+};
+struct TAN : public expression {
+  virtual int eval(const varible &x, const varible &y,
+                   const vector<shared_ptr<expression>> &exprs) const = 0;
+  int l;
+};
+struct VAR1 : public expression {
+  virtual int eval(const varible &x, const varible &y,
+                   const vector<shared_ptr<expression>> &exprs) const = 0;
+};
+struct VAR2 : public expression {
+  virtual int eval(const varible &x, const varible &y,
+                   const vector<shared_ptr<expression>> &exprs) const = 0;
+};
+struct CONSTANT : public expression {
+  virtual int eval(const varible &x, const varible &y,
+                   const vector<shared_ptr<expression>> &exprs) const = 0;
+  double l;
 };
 struct value {
   enum type_t { normal, inf, ninf };
@@ -52,9 +119,9 @@ struct varible {
 };
 std::ostream &operator<<(std::ostream &, varible);
 std::ostream &operator<<(std::ostream &, value);
-using expression = vector<term>;
-expression tokenize(const std::string &expr);
-varible eval(const expression &expr, varible var1, varible var2);
+// using expression = vector<term>;
+shared_ptr<expression> tokenize(const std::string &expr);
+varible eval(const shared_ptr<expression> &expr, varible var1, varible var2);
 
 varible pow(varible, varible);
 varible log(varible);

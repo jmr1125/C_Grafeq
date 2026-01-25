@@ -248,6 +248,30 @@ varible tan(varible a) { return div(sin(a), cos(a)); }
 varible pow(varible a, varible b) {
   varible ans;
   ans.ranges.reserve(a.ranges.size() * b.ranges.size());
+  {
+    varible a1;
+    a1.has_undefined = a.has_undefined;
+    for (auto &A : a.ranges) {
+      if (A.first < 0 && A.second > 0) {
+        a1.ranges.push_back({0, A.second});
+        a1.ranges.push_back({A.first, 0});
+      } else
+        a1.ranges.push_back(A);
+    }
+    a = a1;
+  }
+  {
+    varible b1;
+    b1.has_undefined = a.has_undefined;
+    for (auto &B : b.ranges) {
+      if (B.first < 0 && B.second > 0) {
+        b1.ranges.push_back({0, B.second});
+        b1.ranges.push_back({B.first, 0});
+      } else
+        b1.ranges.push_back(B);
+    }
+    b = b1;
+  }
   for (const auto A : a.ranges) {
     for (const auto B : b.ranges) {
       value low, high;
@@ -260,8 +284,11 @@ varible pow(varible a, varible b) {
         low = value(min(min(p1, p2), min(p3, p4)));
         high = value(max(max(p1, p2), max(p3, p4)));
       }
+      if (isnan(low.v) || isnan(high.v)) {
+        ans.has_undefined = true;
+      } else
 
-      ans.ranges.push_back({low, high});
+        ans.ranges.push_back({low, high});
     }
   }
   ans.has_undefined = (a.has_undefined || b.has_undefined);

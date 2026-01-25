@@ -277,7 +277,7 @@ OPENGL_gl_LIBRARY:FILEPATH=/Applications/Xcode.app/Contents/Developer/Platforms/
 OPENGL_glu_LIBRARY:FILEPATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/System/Library/Frameworks/OpenGL.framework
 
 //The directory containing a CMake configuration file for glfw3.
-glfw3_DIR:PATH=/Users/jiang/radioconda/lib/cmake/glfw3
+glfw3_DIR:PATH=/opt/homebrew/lib/cmake/glfw3
 
 
 ########################

@@ -2,9 +2,9 @@
 #include "eval.h"
 #include <algorithm>
 #include <atomic>
+#include <chrono>
 #include <cstddef>
 #include <cstdio>
-#include <list>
 #include <mutex>
 #include <ostream>
 #include <queue>
@@ -14,7 +14,6 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
-#include <optional>
 #include <thread>
 #include <tuple>
 #include <vector>
@@ -117,31 +116,11 @@ struct range2 {
       return true;
     else
       return false;
-    // auto [x1, y1, d1] = to_xyd();
-    // auto [x2, y2, d2] = rsh.to_xyd();
-    // return make_tuple(d1, x1, y1) < make_tuple(d2, x2, y2);
-    // return (r.size() > rsh.r.size()) ||
-    //        (r.size() == rsh.r.size() &&
-    //         lexicographical_compare(
-    //             r.rbegin(), r.rbegin() + min((int)r.size(), scr_size_dep),
-    //             rsh.r.rbegin(),
-    //             rsh.r.rbegin() + min((int)rsh.r.size(), scr_size_dep),
-    //             [](const bitset<2> &a, const bitset<2> &b) {
-    //               return a.to_ulong() < b.to_ulong();
-    //             })
-    //         // r.back().to_ulong() > rsh.r.back().to_ulong()
-    //        );
-    // return lexicographical_compare(r.begin(), r.end(), rsh.r.begin(),
-    //                                rsh.r.end(),
-    //                                [](const bitset<2> &a, const bitset<2> &b)
-    //                                {
-    //                                  return a.to_ulong() < b.to_ulong();
-    //                                });
   }
   vector<char> r;
 };
 struct expr_drawer {
-  expression expr;
+  shared_ptr<expression> expr;
   bool isInequality;
   mutex need_to_draw_m, prec_m;
   priority_queue<range2> need_to_draw;
@@ -159,15 +138,6 @@ struct expr_drawer {
       auto [I, J, D] = r1.to_xyd();
       for (int x = I * scr_size; x < (I + D) * scr_size; ++x)
         for (int y = J * scr_size; y < (J + D) * scr_size; ++y) {
-          // auto [color0, color1, color2] = get_color(is, v.has_undefined);
-          // image[(x * scr_size + y) * 3 + 0] = color0;
-          // image[(x * scr_size + y) * 3 + 1] = color1;
-          // image[(x * scr_size + y) * 3 + 2] = color2;
-          // cout << "(" << x << "," << y << ")" << (is == point_status::yes)
-          //      << (is == point_status::no);
-          // if (status[x][y] == point_status::no ||
-          //     status[x][y] == point_status::yes)
-          //   continue; // other thread has wroted
           while (true) {
             bool out = false;
             do {
@@ -186,10 +156,6 @@ struct expr_drawer {
         }
     }
     auto [i, j, d] = r.to_xyd();
-    // if (status[i * scr_size][j * scr_size] == point_status::no)
-    //   return false;
-    // if (status[i * scr_size][j * scr_size] == point_status::yes)
-    //   return true;
     varible v =
         eval(expr,
              add(mul(varible(vector({make_pair(value(j), value(j + d))})),
@@ -209,6 +175,8 @@ struct expr_drawer {
       need_to_draw.push(r1);                                                   \
     }                                                                          \
   }
+    // cout << i << ' ' << j << ' ' << d << endl << v << endl;
+    // ;
     point_status is = point_status::no;
     for (auto it = v.ranges.begin(); it != v.ranges.end(); ++it) {
       if (isInequality) {
@@ -224,7 +192,8 @@ struct expr_drawer {
           break;
         }
       } else { // equation
-        if (it->first <= value(0) && value(0) <= it->second) {
+        if (it->first <= value(0) && value(0) <= it->second ||
+            v.has_undefined) {
           for (int s = 0; s < 4; ++s) {
             range2 r1 = r;
             r1.r.push_back(s);
@@ -233,17 +202,6 @@ struct expr_drawer {
             auto [I, J, D] = r1.to_xyd();
             for (int x = I * scr_size; x < (I + D) * scr_size; ++x)
               for (int y = J * scr_size; y < (J + D) * scr_size; ++y) {
-                // auto [color0, color1, color2] = get_color(is,
-                // v.has_undefined); image[(x * scr_size + y) * 3 + 0] = color0;
-                // image[(x * scr_size + y) * 3 + 1] = color1;
-                // image[(x * scr_size + y) * 3 + 2] = color2;
-                // cout << "(" << x << "," << y << ")" << (is ==
-                // point_status::yes)
-                //      << (is == point_status::no);
-                // if (status[x][y] == point_status::no ||
-                //     status[x][y] == point_status::yes)
-                //   continue; // other thread has wroted
-
                 while (true) {
                   bool out = false;
                   do {
@@ -264,26 +222,7 @@ struct expr_drawer {
           is = point_status::need_to_divide;
           if (d > 1.0 / scr_size / 64) {
             add_sub();
-          } // else if (d > 1.0 / scr_size / 64) {
-          //   auto r1 = r;
-          //   if (r1.r.size() > scr_size_dep)
-          //     r1.r.resize(scr_size_dep, 0);
-          //   auto [I, J, D] = r1.to_xyd();
-          //   if (D != 1.0 / scr_size) {
-          //     cout << "?";
-          //   }
-          //   int x0 = I * scr_size, y0 = J * scr_size;
-          //   int c = 0;
-          //   for (int dx = -1; dx <= 1; ++dx) {
-          //     for (int dy = -1; dy <= 1; ++dy) {
-          //       if (0 <= x0 + dx && x0 + dx <= scr_size && 0 <= y0 + dy &&
-          //           y0 + dy <= scr_size && root_count[x0 + dx][y0 + dy])
-          //         c++;
-          //     }
-          //   }
-          //   if (c > 4)
-          //     add_sub();
-          // }
+          }
           break;
         } else {
           is = point_status::no;
@@ -302,15 +241,6 @@ struct expr_drawer {
       auto [I, J, D] = r1.to_xyd();
       for (int x = I * scr_size; x < (I + D) * scr_size; ++x)
         for (int y = J * scr_size; y < (J + D) * scr_size; ++y) {
-          // auto [color0, color1, color2] = get_color(is, v.has_undefined);
-          // image[(x * scr_size + y) * 3 + 0] = color0;
-          // image[(x * scr_size + y) * 3 + 1] = color1;
-          // image[(x * scr_size + y) * 3 + 2] = color2;
-          // cout << "(" << x << "," << y << ")" << (is == point_status::yes)
-          //      << (is == point_status::no);
-          // if (status[x][y] == point_status::no ||
-          //     status[x][y] == point_status::yes)
-          //   continue; // other thread has wroted
           while (true) {
             bool out = false;
             do {
@@ -388,24 +318,10 @@ struct expr_drawer {
         cerr << "Done" << endl;
         return;
       }
-      // if (id == need_to_draw.size()) {
-      //   id = 0;
-      //   need_to_draw = next_to_draw;
-      // next_to_draw.clear();
-      //   if (need_to_draw.size() == 0) {
-      //     done = true;
-      //     cout << "Done" << endl;
-      //   }
-      //   return;
-      // }
       front = need_to_draw.top();
       need_to_draw.pop();
     }
-    // if (status[get<0>(front) * scr_size][get<1>(front) * scr_size] ==
-    //     point_status::need_to_divide)
     process(front);
-    // process(get<0>(front), get<1>(front), get<2>(front));
-    //  ++id;
   }
 };
 bool stop = false;
@@ -535,7 +451,9 @@ int main(int argc, char **argv) {
   auto it = 0;
   vector<shared_ptr<expr_drawer>> draws;
   int cur = 0;
-  // cout << "YUV4MPEG2 W" << scr_size << " H" << scr_size << " F25:1 Ip A0:0";
+  int thread_num = thread::hardware_concurrency();
+  int changes = 0;
+  int tot = 1024;
   printf("YUV4MPEG2 W%d H%d F25:1 Ip A0:0 C444", scr_size, scr_size);
   putchar(10);
   while (!glfwWindowShouldClose(window)) {
@@ -550,12 +468,46 @@ int main(int argc, char **argv) {
           break;
       }
     }
-    // if (cur == 0 &&
-    //     ((draws.size() == 1 && draws.at(0)->done) || draws.size() != 1))
-    if (all_of(draws.begin(), draws.end(),
-               [](shared_ptr<expr_drawer> x) { return x->done; }))
-      stop = true;
+    stop = all_of(draws.begin(), draws.end(),
+                  [](shared_ptr<expr_drawer> x) { return x->done; });
+    // for (int i = 0; i < scr_size; ++i) {
+    //   for (int j = 0; j < scr_size; ++j) {
+    //     image[(i * scr_size + j) * 3 + 0] = image[(i * scr_size + j) * 3 + 1]
+    //     =
+    //         image[(i * scr_size + j) * 3 + 2] = 0;
+    //   }
+    // }
+    for (int i = 0; i < scr_size; ++i) {
+      for (int j = 0; j < scr_size; ++j) {
+        unsigned char r = 0, g = 0, b = 0;
+        for (int c = 0; c < draws.size(); ++c) {
+          bool v;
+          if (draws.at(c)->isInequality) {
+            v = (draws.at(c)->status[i][j] != point_status::no);
+          } else {
+            v = draws.at(c)->root_count[i][j];
+          }
+          if (v) {
+            r = draws[c]->c1;
+            g = draws[c]->c2;
+            b = draws[c]->c3;
+            break;
+          }
+        }
+        if (image[(i * scr_size + j) * 3 + 0] == r &&
+            image[(i * scr_size + j) * 3 + 1] == g &&
+            image[(i * scr_size + j) * 3 + 2] == b) {
+        } else {
+          ++changes;
+          image[(i * scr_size + j) * 3 + 0] = r;
+          image[(i * scr_size + j) * 3 + 1] = g;
+          image[(i * scr_size + j) * 3 + 2] = b;
+        }
+      }
+    }
+    bool to_draw_yuv = !stop && changes >= 40;
     if (cur < draws.size()) {
+      auto t1 = chrono::system_clock::now();
       vector<thread> ths;
       cerr << cur << " : ";
       {
@@ -566,9 +518,9 @@ int main(int argc, char **argv) {
             cerr << " ";
         }
       }
-      cerr << "\r" << flush;
-      int tot = 1024;
-      int thread_num = 3; // thread::hardware_concurrency();
+      cerr << "   (" << changes << " px changes)    \r" << flush;
+      // int thread_num = // 3;
+      //     thread::hardware_concurrency() / 2;
       for (int i = 0; i < thread_num; ++i) {
         ths.push_back(thread([&, i] {
           for (int c = 0; c < tot / thread_num && !stop; ++c) {
@@ -579,44 +531,26 @@ int main(int argc, char **argv) {
       }
       for (auto &t : ths)
         t.join();
+      auto t2 = chrono::system_clock::now();
+      if (t2 - t1 < 300ms) {
+        tot += 16;
+      } else {
+        tot -= 16;
+      }
     }
     if (draws.size() > cur)
       cerr << draws.at(cur)->need_to_draw.size() << " calc left   ";
-    for (int i = 0; i < scr_size; ++i) {
-      for (int j = 0; j < scr_size; ++j) {
-        image[(i * scr_size + j) * 3 + 0] = image[(i * scr_size + j) * 3 + 1] =
-            image[(i * scr_size + j) * 3 + 2] = 0;
+
+    if (to_draw_yuv || stop) {
+      if (to_draw_yuv) {
+        changes = 0;
       }
-    }
-    for (int c = 0; c < draws.size(); ++c)
-      for (int i = 0; i < scr_size; ++i) {
-        for (int j = 0; j < scr_size; ++j) {
-          bool v;
-          if (draws.at(c)->isInequality) {
-            v = (draws.at(c)->status[i][j] != point_status::no);
-          } else {
-            v = draws.at(c)->root_count[i][j];
-          }
-          if (v) {
-            image[(i * scr_size + j) * 3 + 0] = draws[c]->c1;
-            image[(i * scr_size + j) * 3 + 1] = draws[c]->c2;
-            image[(i * scr_size + j) * 3 + 2] = draws[c]->c3;
-          }
-          // bool u = (draws[c].status[i][j] == point_status::need_to_divide);
-          // if (u) {
-          //   image[(i * scr_size + j) * 3 + 0] = 64;
-          //   image[(i * scr_size + j) * 3 + 1] = 64;
-          //   image[(i * scr_size + j) * 3 + 2] = 64;
-          // }
-        }
-      }
-    if (!stop) {
-      // cout << char(10);
-      // cout << "FRAME" << char(10) << flush;
+#if 0
       printf("FRAME");
       putchar(10);
       for (int c = 0; c < 3; ++c)
-        for (int i = 0; i < scr_size; ++i) {
+        // for (int i = 0; i < scr_size; ++i)
+        for (int i = scr_size - 1; i >= 0; --i) {
           // cerr << i << ' ';
           for (int j = 0; j < scr_size; ++j) {
             int r = image[(i * scr_size + j) * 3 + 0],
@@ -629,8 +563,8 @@ int main(int argc, char **argv) {
             putchar(yuv[c]);
           }
         }
+#endif
     }
-
     if (stop) {
       cerr << endl
            << "Equation, Inequality, List, Setcolor, Delete, Quit" << endl;
@@ -703,6 +637,14 @@ int main(int argc, char **argv) {
           break;
         }
         draws.erase(draws.begin() + i);
+        break;
+      case 'T':
+        cerr << "thread num: " << thread_num << endl << " -> ";
+        cin >> thread_num;
+        if (thread_num < 1) {
+          cerr << "thread_num<1" << endl;
+          thread_num = 1;
+        }
         break;
       }
       stop = false;

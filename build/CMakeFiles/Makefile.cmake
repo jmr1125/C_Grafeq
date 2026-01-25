@@ -41,14 +41,14 @@ set(CMAKE_MAKEFILE_DEPENDS
   "CMakeFiles/3.28.3/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.28.3/CMakeSystem.cmake"
   "/Users/jiang/desktop/C_GrafEq/CMakeLists.txt"
-  "/Users/jiang/radioconda/lib/cmake/glfw3/glfw3Config.cmake"
-  "/Users/jiang/radioconda/lib/cmake/glfw3/glfw3ConfigVersion.cmake"
-  "/Users/jiang/radioconda/lib/cmake/glfw3/glfw3Targets-release.cmake"
-  "/Users/jiang/radioconda/lib/cmake/glfw3/glfw3Targets.cmake"
   "/opt/homebrew/lib/cmake/glew/CopyImportedTargetProperties.cmake"
   "/opt/homebrew/lib/cmake/glew/glew-config.cmake"
   "/opt/homebrew/lib/cmake/glew/glew-targets-release.cmake"
   "/opt/homebrew/lib/cmake/glew/glew-targets.cmake"
+  "/opt/homebrew/lib/cmake/glfw3/glfw3Config.cmake"
+  "/opt/homebrew/lib/cmake/glfw3/glfw3ConfigVersion.cmake"
+  "/opt/homebrew/lib/cmake/glfw3/glfw3Targets-release.cmake"
+  "/opt/homebrew/lib/cmake/glfw3/glfw3Targets.cmake"
   )
 
 # The corresponding makefile is:

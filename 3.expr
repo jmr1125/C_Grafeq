@@ -1,0 +1,1 @@
+sin(sin(x*(sin(y)-cos(x))))-cos(cos(y*(cos(x)-sin(y))))

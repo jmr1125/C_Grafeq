@@ -108,7 +108,7 @@ C_GrafEQ_EXTERNAL_OBJECTS =
 C_GrafEQ: CMakeFiles/C_GrafEQ.dir/main.cpp.o
 C_GrafEQ: CMakeFiles/C_GrafEQ.dir/eval.cpp.o
 C_GrafEQ: CMakeFiles/C_GrafEQ.dir/build.make
-C_GrafEQ: /Users/jiang/radioconda/lib/libglfw.3.4.dylib
+C_GrafEQ: /opt/homebrew/lib/libglfw.3.4.dylib
 C_GrafEQ: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/System/Library/Frameworks/OpenGL.framework
 C_GrafEQ: /opt/homebrew/lib/libGLEW.2.2.0.dylib
 C_GrafEQ: CMakeFiles/C_GrafEQ.dir/link.txt

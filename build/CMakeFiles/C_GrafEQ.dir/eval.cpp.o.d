@@ -1,7 +1,7 @@
 CMakeFiles/C_GrafEQ.dir/eval.cpp.o: \
   /Users/jiang/desktop/C_GrafEq/eval.cpp \
   /Users/jiang/desktop/C_GrafEq/eval.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/ostream \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/memory \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__config \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__config_site \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__configuration/abi.h \
@@ -9,8 +9,8 @@ CMakeFiles/C_GrafEQ.dir/eval.cpp.o: \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__configuration/platform.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__configuration/availability.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__configuration/language.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__ostream/basic_ostream.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__exception/operations.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/addressof.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/align.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/cstddef \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/enable_if.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/integral_constant.h \
@@ -30,75 +30,32 @@ CMakeFiles/C_GrafEQ.dir/eval.cpp.o: \
   /opt/homebrew/Cellar/llvm/19.1.7_1/lib/clang/19/include/__stddef_nullptr_t.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/lib/clang/19/include/__stddef_max_align_t.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/lib/clang/19/include/__stddef_offsetof.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/shared_ptr.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__compare/compare_three_way.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__compare/three_way_comparable.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__compare/common_comparison_category.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__compare/ordering.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_same.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__concepts/common_reference_with.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__concepts/convertible_to.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_convertible.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__utility/declval.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__concepts/same_as.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/common_reference.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/common_type.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/conditional.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/decay.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/add_pointer.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_referenceable.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_void.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/remove_reference.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_array.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_function.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/remove_extent.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/remove_cvref.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/void_t.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/copy_cv.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/copy_cvref.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/add_lvalue_reference.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/add_rvalue_reference.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_reference.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__concepts/equality_comparable.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__concepts/boolean_testable.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__utility/forward.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/make_const_lvalue_ref.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__concepts/totally_ordered.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__exception/exception.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__functional/binary_function.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__functional/operations.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__functional/unary_function.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/desugars_to.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__functional/reference_wrapper.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__compare/synth_three_way.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__functional/invoke.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/invoke.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_base_of.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_core_convertible.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_member_pointer.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_reference_wrapper.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__fwd/functional.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/nat.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__functional/weak_result_type.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/addressof.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_const.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__fwd/ostream.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__fwd/string.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__fwd/memory.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__fwd/memory_resource.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__iterator/access.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/allocation_guard.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/allocator.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/allocate_at_least.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/allocator_traits.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/construct_at.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__assert \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__assertion_handler \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__verbose_abort \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__iterator/access.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/voidify.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_array.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__utility/declval.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__utility/forward.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_reference.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/remove_reference.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__utility/move.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/conditional.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_constructible.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/add_lvalue_reference.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_referenceable.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_same.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/add_rvalue_reference.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_nothrow_constructible.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__undef_macros \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/new \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__exception/exception.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_function.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/cstdlib \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/stdlib.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/stdlib.h \
@@ -180,28 +137,41 @@ CMakeFiles/C_GrafEQ.dir/eval.cpp.o: \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/sys/_types/_dev_t.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/sys/_types/_mode_t.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/type_traits \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__fwd/functional.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/add_const.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/add_cv.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/add_pointer.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_void.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/add_volatile.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/aligned_storage.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/nat.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/type_list.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/aligned_union.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/alignment_of.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/common_type.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/decay.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/remove_extent.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/remove_cvref.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/void_t.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/extent.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/has_virtual_destructor.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_abstract.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_arithmetic.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_floating_point.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_assignable.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_base_of.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_class.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_compound.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_fundamental.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_null_pointer.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_const.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_convertible.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_destructible.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/remove_all_extents.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_empty.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_enum.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_literal_type.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_member_pointer.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_nothrow_assignable.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_nothrow_destructible.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_object.h \
@@ -221,10 +191,15 @@ CMakeFiles/C_GrafEQ.dir/eval.cpp.o: \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_unsigned.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_volatile.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/make_signed.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/copy_cv.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/make_unsigned.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/rank.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/remove_pointer.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/result_of.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__functional/invoke.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/invoke.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_core_convertible.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_reference_wrapper.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/underlying_type.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_final.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/conjunction.h \
@@ -233,6 +208,8 @@ CMakeFiles/C_GrafEQ.dir/eval.cpp.o: \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_aggregate.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_swappable.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/negation.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/common_reference.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/copy_cvref.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_bounded_array.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_constant_evaluated.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_nothrow_convertible.h \
@@ -242,10 +219,35 @@ CMakeFiles/C_GrafEQ.dir/eval.cpp.o: \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/unwrap_ref.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/pointer_traits.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/limits \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/allocator.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/allocate_at_least.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/allocator_destructor.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/allocator_arg_t.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/uses_allocator.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/auto_ptr.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/inout_ptr.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/shared_ptr.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__compare/compare_three_way.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__compare/three_way_comparable.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__compare/common_comparison_category.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__compare/ordering.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__concepts/common_reference_with.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__concepts/convertible_to.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__concepts/same_as.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__concepts/equality_comparable.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__concepts/boolean_testable.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/make_const_lvalue_ref.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__concepts/totally_ordered.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__functional/binary_function.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__functional/operations.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__functional/unary_function.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/desugars_to.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__functional/reference_wrapper.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__compare/synth_three_way.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__functional/weak_result_type.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__fwd/ostream.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__fwd/string.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__fwd/memory.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__fwd/memory_resource.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/allocation_guard.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/allocator_destructor.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/compressed_pair.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__fwd/tuple.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__tuple/tuple_indices.h \
@@ -352,74 +354,8 @@ CMakeFiles/C_GrafEQ.dir/eval.cpp.o: \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/_strings.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/typeinfo \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__atomic/memory_order.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__system_error/error_code.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__system_error/errc.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/cerrno \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/errno.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/errno.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/sys/errno.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__system_error/error_category.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/string \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/max.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/max_element.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/remove.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/find.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/find_segment_if.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__bit/countr.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__bit/rotate.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__bit/invert_if.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__fwd/bit_reference.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/cwchar \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/cwctype \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/cctype \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/ctype.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/ctype.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/_ctype.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/runetype.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/sys/_types/_wint_t.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/wctype.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/wctype.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/_wctype.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/_types/_wctrans_t.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/__wctype.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/___wctype.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/_types/_wctype_t.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/wchar.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/wchar.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/_wchar.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/sys/_types/_mbstate_t.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/lib/clang/19/include/__stdarg_header_macro.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/lib/clang/19/include/__stdarg___gnuc_va_list.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/lib/clang/19/include/__stdarg_va_arg.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/lib/clang/19/include/__stdarg___va_copy.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/lib/clang/19/include/__stdarg_va_copy.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/stdio.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/stdio.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/_stdio.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/sys/stdio.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/_printf.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/sys/_types/_seek_set.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/_ctermid.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/sys/_types/_off_t.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/time.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/_time.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/sys/_types/_clock_t.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/sys/_types/_time_t.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/sys/_types/_timespec.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/find_if.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/remove_if.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__debug_utils/sanitizers.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__format/enable_insertable.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__ios/fpos.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__fwd/ios.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__iterator/bounded_iter.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__iterator/wrap_iter.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/swap_allocator.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory_resource/polymorphic_allocator.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory_resource/memory_resource.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_specialization.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/tuple \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/allocator_arg_t.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/uses_allocator.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__tuple/find_index.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__tuple/ignore.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/maybe_const.h \
@@ -438,6 +374,8 @@ CMakeFiles/C_GrafEQ.dir/eval.cpp.o: \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__compare/is_eq.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/cmath \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__math/hypot.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/max.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/max_element.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__math/abs.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__math/roots.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__math/special_functions.h \
@@ -459,66 +397,32 @@ CMakeFiles/C_GrafEQ.dir/eval.cpp.o: \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__math/trigonometric_functions.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/exception \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__exception/exception_ptr.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__exception/operations.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__exception/nested_exception.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__exception/terminate.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/iosfwd \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__fwd/fstream.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__fwd/ios.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__fwd/istream.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__fwd/sstream.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__fwd/streambuf.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__std_mbstate_t.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__mbstate_t.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/sys/_types/_mbstate_t.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/utility \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__utility/rel_ops.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__utility/as_const.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__utility/in_place.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__utility/cmp.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__ranges/container_compatible_range.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__ranges/from_range.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__string/char_traits.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/fill_n.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/find_end.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/search.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/find_first_of.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/cstdio \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__string/extern_template_lists.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_allocator.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/noexcept_move_assign_container.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/climits \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/lib/clang/19/include/limits.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/limits.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/machine/limits.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/arm/limits.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/arm/_limits.h \
-  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/sys/syslimits.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/stdexcept \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/string_view \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__fwd/string_view.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__iterator/data.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__iterator/empty.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__iterator/reverse_access.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__iterator/size.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/algorithm \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/adjacent_find.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/all_of.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/any_of.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/binary_search.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/lower_bound.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/half_positive.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/copy_backward.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/copy_if.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/copy_n.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/count.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__bit/popcount.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/count_if.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/equal.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/equal_range.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/upper_bound.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/fill.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/find_if_not.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/for_each.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__ranges/movable_box.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/optional \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/out_ptr.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/raw_storage_iterator.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/temporary_buffer.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/assume_aligned.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/concepts.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/ranges_construct_at.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/ranges_uninitialized_algorithms.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/in_out_result.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/uses_allocator_construction.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/atomic \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__atomic/aliases.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__atomic/atomic.h \
@@ -529,15 +433,30 @@ CMakeFiles/C_GrafEQ.dir/eval.cpp.o: \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__atomic/to_gcc_order.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__chrono/duration.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/ratio \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/climits \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/lib/clang/19/include/limits.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/limits.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/machine/limits.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/arm/limits.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/arm/_limits.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/sys/syslimits.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__thread/poll_with_backoff.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__chrono/high_resolution_clock.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__chrono/steady_clock.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__chrono/time_point.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__chrono/system_clock.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/ctime \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/time.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/_time.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/sys/_types/_clock_t.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/sys/_types/_time_t.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/sys/_types/_timespec.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__thread/support.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__thread/support/pthread.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__chrono/convert_to_timespec.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/errno.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/errno.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/sys/errno.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/pthread.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/pthread/sched.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/pthread/pthread_impl.h \
@@ -575,6 +494,11 @@ CMakeFiles/C_GrafEQ.dir/eval.cpp.o: \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__iterator/move_sentinel.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__iterator/ostream_iterator.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__iterator/ostreambuf_iterator.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__iterator/wrap_iter.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__iterator/reverse_access.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__iterator/data.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__iterator/empty.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__iterator/size.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__iterator/common_iterator.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/variant \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__utility/forward_like.h \
@@ -587,19 +511,95 @@ CMakeFiles/C_GrafEQ.dir/eval.cpp.o: \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__iterator/permutable.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__iterator/sortable.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__iterator/unreachable_sentinel.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/memory \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/align.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/inout_ptr.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_specialization.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/out_ptr.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/raw_storage_iterator.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/temporary_buffer.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/assume_aligned.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/concepts.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/ranges_construct_at.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/ranges_uninitialized_algorithms.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/in_out_result.h \
-  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/uses_allocator_construction.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/stdexcept \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/ostream \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__ostream/basic_ostream.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__system_error/error_code.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__system_error/errc.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/cerrno \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__system_error/error_category.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/string \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/remove.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/find.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/find_segment_if.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__bit/countr.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__bit/rotate.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__bit/invert_if.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__fwd/bit_reference.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/cwchar \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/cwctype \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/cctype \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/ctype.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/ctype.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/_ctype.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/runetype.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/sys/_types/_wint_t.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/wctype.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/wctype.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/_wctype.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/_types/_wctrans_t.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/__wctype.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/___wctype.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/_types/_wctype_t.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/wchar.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/wchar.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/_wchar.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/lib/clang/19/include/__stdarg_header_macro.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/lib/clang/19/include/__stdarg___gnuc_va_list.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/lib/clang/19/include/__stdarg_va_arg.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/lib/clang/19/include/__stdarg___va_copy.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/lib/clang/19/include/__stdarg_va_copy.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/stdio.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/stdio.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/_stdio.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/sys/stdio.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/_printf.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/sys/_types/_seek_set.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/_ctermid.h \
+  /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/sys/_types/_off_t.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/find_if.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/remove_if.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__debug_utils/sanitizers.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__format/enable_insertable.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__ios/fpos.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__iterator/bounded_iter.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory/swap_allocator.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory_resource/polymorphic_allocator.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__memory_resource/memory_resource.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__ranges/container_compatible_range.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__ranges/from_range.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__string/char_traits.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/fill_n.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/find_end.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/search.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/find_first_of.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/cstdio \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__string/extern_template_lists.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/is_allocator.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__type_traits/noexcept_move_assign_container.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/string_view \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__fwd/string_view.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/algorithm \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/adjacent_find.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/all_of.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/any_of.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/binary_search.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/lower_bound.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/half_positive.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/copy_backward.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/copy_if.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/copy_n.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/count.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__bit/popcount.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/count_if.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/equal.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/equal_range.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/upper_bound.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/fill.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/find_if_not.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/for_each.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__ranges/movable_box.h \
+  /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/optional \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/generate.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/generate_n.h \
   /opt/homebrew/Cellar/llvm/19.1.7_1/bin/../include/c++/v1/__algorithm/includes.h \
