@@ -120,7 +120,7 @@ struct range2 {
   vector<char> r;
 };
 struct expr_drawer {
-  shared_ptr<expression> expr;
+  expression expr;
   bool isInequality;
   mutex need_to_draw_m, prec_m;
   priority_queue<range2> need_to_draw;
@@ -157,13 +157,12 @@ struct expr_drawer {
     }
     auto [i, j, d] = r.to_xyd();
     varible v =
-        eval(expr,
-             add(mul(varible(vector({make_pair(value(j), value(j + d))})),
-                     value(xmax - xmin)),
-                 value(xmin)),
-             add(mul(varible(vector({make_pair(value(i), value(i + d))})),
-                     value(ymax - ymin)),
-                 value(ymin)));
+        expr.eval(add(mul(varible(vector({make_pair(value(j), value(j + d))})),
+                          value(xmax - xmin)),
+                      value(xmin)),
+                  add(mul(varible(vector({make_pair(value(i), value(i + d))})),
+                          value(ymax - ymin)),
+                      value(ymin)));
     // cout << "(" << i << ", " << j << ")" << v << ' ' << d << endl;
 #define add_sub()                                                              \
   {                                                                            \

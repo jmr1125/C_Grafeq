@@ -2,10 +2,12 @@
 #include <algorithm>
 #include <assert.h>
 #include <cmath>
+#include <memory>
 #include <ostream>
 #include <sstream>
 #include <stack>
 #include <utility>
+#include <vector>
 using namespace std;
 
 value value::operator+(value r) const {
@@ -108,40 +110,72 @@ bool value::operator!=(value r) const { return !(*this == r); }
 
 expression tokenize(const string &expr) {
   stringstream ss(expr);
-  expression e;
+  expression ex;
+  vector<shared_ptr<_expr>> &e = ex.exprs;
+  stack<int> num;
   char c;
-  while (ss >> c) {
+  for (int i = 0; ss >> c; ++i) {
     if (c == 'v') {
       double v;
       ss >> v;
-      e.push_back({CONSTANT, v});
+      e.push_back(make_shared<CONSTANT>(v));
     } else if (c == 'a') {
-      e.push_back({ADD});
+      int l = num.top();
+      num.pop();
+      int r = num.top();
+      num.pop();
+      e.push_back(make_shared<ADD>(l, r));
     } else if (c == 's') {
-      e.push_back({SUB});
+      int l = num.top();
+      num.pop();
+      int r = num.top();
+      num.pop();
+      e.push_back(make_shared<SUB>(l, r));
     } else if (c == 'm') {
-      e.push_back({MUL});
+      int l = num.top();
+      num.pop();
+      int r = num.top();
+      num.pop();
+      e.push_back(make_shared<MUL>(l, r));
     } else if (c == 'd') {
-      e.push_back({DIV});
+      int l = num.top();
+      num.pop();
+      int r = num.top();
+      num.pop();
+      e.push_back(make_shared<DIV>(l, r));
     } else if (c == 'p') {
-      e.push_back({POW});
+      int l = num.top();
+      num.pop();
+      int r = num.top();
+      num.pop();
+      e.push_back(make_shared<POW>(l, r));
     } else if (c == 'l') {
-      e.push_back({LOG});
+      int x = num.top();
+      num.pop();
+      e.push_back(make_shared<LOG>(x));
     } else if (c == 'S') {
-      e.push_back({SIN});
+      int x = num.top();
+      num.pop();
+      e.push_back(make_shared<SIN>(x));
     } else if (c == 'C') {
-      e.push_back({COS});
+      int x = num.top();
+      num.pop();
+      e.push_back(make_shared<COS>(x));
     } else if (c == 'T') {
-      e.push_back({TAN});
+      int x = num.top();
+      num.pop();
+      e.push_back(make_shared<TAN>(x));
     } else if (c == 'x') {
-      e.push_back({VAR1});
+      e.push_back(make_shared<VAR1>());
     } else if (c == 'y') {
-      e.push_back({VAR2});
-    } else {
+      e.push_back(make_shared<VAR2>());
+    }
+    else {
       throw "";
     }
+    num.push(i);
   }
-  return e;
+  return ex;
 }
 ostream &operator<<(ostream &ost, value x) {
   if (x.type == value::ninf)
@@ -399,78 +433,55 @@ varible log(varible a) {
   return ans;
 }
 
-varible eval(const expression &e, varible x, varible y) {
-  stack<varible> num;
-  varible a, b;
-  for (auto &i : e) {
-    switch (i.op) {
-    case ADD:
-      b = num.top();
-      num.pop();
-      a = num.top();
-      num.pop();
-      num.push(add(a, b));
-      break;
-    case SUB:
-      b = num.top();
-      num.pop();
-      a = num.top();
-      num.pop();
-      num.push(add(a, neg(b)));
-      break;
-    case MUL:
-      b = num.top();
-      num.pop();
-      a = num.top();
-      num.pop();
-      num.push(mul(a, b));
-      break;
-    case DIV:
-      b = num.top();
-      num.pop();
-      a = num.top();
-      num.pop();
-      num.push(div(a, b));
-      break;
-    case POW:
-      b = num.top();
-      num.pop();
-      a = num.top();
-      num.pop();
-      num.push(pow(a, b));
-      break;
-    case LOG:
-      b = num.top();
-      num.pop();
-      a = num.top();
-      num.pop();
-      num.push(mul(log(a), one_div(log(b))));
-      break;
-    case SIN:
-      a = num.top();
-      num.pop();
-      num.push(sin(a));
-      break;
-    case COS:
-      a = num.top();
-      num.pop();
-      num.push(cos(a));
-      break;
-    case TAN:
-      a = num.top();
-      num.pop();
-      num.push(tan(a));
-      break;
-    case VAR1:
-      num.push(x);
-      break;
-    case VAR2:
-      num.push(y);
-      break;
-    case CONSTANT:
-      num.push(varible({make_pair(value(i.constant), value(i.constant))}));
-      break;
-    }
-  }
-  return num.top();
+varible expression::eval(const varible &x, const varible &y) {
+  return exprs.back()->eval(x, y, exprs);
 }
+varible ADD::eval(const varible &x, const varible &y,
+                  const vector<shared_ptr<_expr>> &exprs) const {
+  return add(exprs[l]->eval(x, y, exprs), exprs[r]->eval(x, y, exprs));
+}
+varible SUB::eval(const varible &x, const varible &y,
+                  const vector<shared_ptr<_expr>> &exprs) const {
+  return add(exprs[l]->eval(x, y, exprs), neg(exprs[r]->eval(x, y, exprs)));
+}
+varible MUL::eval(const varible &x, const varible &y,
+                  const vector<shared_ptr<_expr>> &exprs) const {
+  return mul(exprs[l]->eval(x, y, exprs), exprs[r]->eval(x, y, exprs));
+}
+varible DIV::eval(const varible &x, const varible &y,
+                  const vector<shared_ptr<_expr>> &exprs) const {
+  return mul(exprs[l]->eval(x, y, exprs), one_div(exprs[r]->eval(x, y, exprs)));
+}
+
+varible POW::eval(const varible &x, const varible &y,
+                  const vector<shared_ptr<_expr>> &exprs) const {
+  return pow(exprs[l]->eval(x, y, exprs), exprs[r]->eval(x, y, exprs));
+}
+varible LOG::eval(const varible &x, const varible &y,
+                  const vector<shared_ptr<_expr>> &exprs) const {
+  return log(exprs[l]->eval(x, y, exprs));
+}
+varible SIN::eval(const varible &x, const varible &y,
+                  const vector<shared_ptr<_expr>> &exprs) const {
+  return sin(exprs[l]->eval(x, y, exprs));
+}
+varible COS::eval(const varible &x, const varible &y,
+                  const vector<shared_ptr<_expr>> &exprs) const {
+  return cos(exprs[l]->eval(x, y, exprs));
+}
+varible TAN::eval(const varible &x, const varible &y,
+                  const vector<shared_ptr<_expr>> &exprs) const {
+  return tan(exprs[l]->eval(x, y, exprs));
+}
+varible VAR1::eval(const varible &x, const varible &,
+                   const vector<shared_ptr<_expr>> &) const {
+  return x;
+}
+varible VAR2::eval(const varible &, const varible &y,
+                   const vector<shared_ptr<_expr>> &) const {
+  return y;
+}
+varible CONSTANT::eval(const varible &x, const varible &y,
+                       const vector<shared_ptr<_expr>> &) const {
+  return value(l);
+};

@@ -24,68 +24,81 @@ using std::vector;
 //   double constant;
 // };
 struct varible;
+struct _expr {
+  virtual ~_expr() = default;
+  virtual varible eval(const varible &x, const varible &y,
+                       const vector<shared_ptr<_expr>> &) const = 0;
+};
 struct expression {
-  virtual int eval(const varible &x, const varible &y,
-                   const vector<shared_ptr<expression>> &exprs) const = 0;
-  virtual ~expression() = default;
-  vector<shared_ptr<expression>> exprs;
+  varible eval(const varible &x, const varible &y);
+  vector<shared_ptr<_expr>> exprs;
 };
-struct ADD : public expression {
-  virtual int eval(const varible &x, const varible &y,
-                   const vector<shared_ptr<expression>> &exprs) const = 0;
+struct ADD : public _expr {
+  ADD(int l, int r) : l(l), r(r) {}
+  virtual varible eval(const varible &x, const varible &y,
+                       const vector<shared_ptr<_expr>> &exprs) const;
   int l, r;
 };
-struct SUB : public expression {
-  virtual int eval(const varible &x, const varible &y,
-                   const vector<shared_ptr<expression>> &exprs) const = 0;
+struct SUB : public _expr {
+  SUB(int l, int r) : l(l), r(r) {}
+  virtual varible eval(const varible &x, const varible &y,
+                       const vector<shared_ptr<_expr>> &exprs) const;
   int l, r;
 };
-struct MUL : public expression {
-  virtual int eval(const varible &x, const varible &y,
-                   const vector<shared_ptr<expression>> &exprs) const = 0;
+struct MUL : public _expr {
+  MUL(int l, int r) : l(l), r(r) {}
+  virtual varible eval(const varible &x, const varible &y,
+                       const vector<shared_ptr<_expr>> &exprs) const;
   int l, r;
 };
-struct DIV : public expression {
-  virtual int eval(const varible &x, const varible &y,
-                   const vector<shared_ptr<expression>> &exprs) const = 0;
+struct DIV : public _expr {
+  DIV(int l, int r) : l(l), r(r) {}
+  virtual varible eval(const varible &x, const varible &y,
+                       const vector<shared_ptr<_expr>> &exprs) const;
   int l, r;
 };
-struct POW : public expression {
-  virtual int eval(const varible &x, const varible &y,
-                   const vector<shared_ptr<expression>> &exprs) const = 0;
+struct POW : public _expr {
+  POW(int l, int r) : l(l), r(r) {}
+  virtual varible eval(const varible &x, const varible &y,
+                       const vector<shared_ptr<_expr>> &exprs) const;
   int l, r;
 };
-struct LOG : public expression {
-  virtual int eval(const varible &x, const varible &y,
-                   const vector<shared_ptr<expression>> &exprs) const = 0;
+struct LOG : public _expr {
+  LOG(int l) : l(l) {}
+  virtual varible eval(const varible &x, const varible &y,
+                       const vector<shared_ptr<_expr>> &exprs) const;
   int l;
 };
-struct SIN : public expression {
-  virtual int eval(const varible &x, const varible &y,
-                   const vector<shared_ptr<expression>> &exprs) const = 0;
+struct SIN : public _expr {
+  SIN(int l) : l(l) {}
+  virtual varible eval(const varible &x, const varible &y,
+                       const vector<shared_ptr<_expr>> &exprs) const;
   int l;
 };
-struct COS : public expression {
-  virtual int eval(const varible &x, const varible &y,
-                   const vector<shared_ptr<expression>> &exprs) const = 0;
+struct COS : public _expr {
+  COS(int l) : l(l) {}
+  virtual varible eval(const varible &x, const varible &y,
+                       const vector<shared_ptr<_expr>> &exprs) const;
   int l;
 };
-struct TAN : public expression {
-  virtual int eval(const varible &x, const varible &y,
-                   const vector<shared_ptr<expression>> &exprs) const = 0;
+struct TAN : public _expr {
+  TAN(int l) : l(l) {}
+  virtual varible eval(const varible &x, const varible &y,
+                       const vector<shared_ptr<_expr>> &exprs) const;
   int l;
 };
-struct VAR1 : public expression {
-  virtual int eval(const varible &x, const varible &y,
-                   const vector<shared_ptr<expression>> &exprs) const = 0;
+struct VAR1 : public _expr {
+  virtual varible eval(const varible &x, const varible &y,
+                       const vector<shared_ptr<_expr>> &exprs) const;
 };
-struct VAR2 : public expression {
-  virtual int eval(const varible &x, const varible &y,
-                   const vector<shared_ptr<expression>> &exprs) const = 0;
+struct VAR2 : public _expr {
+  virtual varible eval(const varible &x, const varible &y,
+                       const vector<shared_ptr<_expr>> &exprs) const;
 };
-struct CONSTANT : public expression {
-  virtual int eval(const varible &x, const varible &y,
-                   const vector<shared_ptr<expression>> &exprs) const = 0;
+struct CONSTANT : public _expr {
+  CONSTANT(double l) : l(l) {}
+  virtual varible eval(const varible &x, const varible &y,
+                       const vector<shared_ptr<_expr>> &) const override;
   double l;
 };
 struct value {
@@ -109,19 +122,18 @@ struct value {
 };
 struct varible {
   varible() = default;
-  varible(vector<pair<value, value>> r) : ranges(r), has_undefined(false){};
+  varible(pair<value, value> r) : ranges(r), has_undefined(false){};
   varible(value x) : ranges({std::make_pair(x, x)}), has_undefined(false){};
   varible(value l, value r)
       : ranges({std::make_pair(l, r)}), has_undefined(false){};
   void sort();
-  vector<pair<value, value>> ranges;
+  pair<value, value> ranges;
   bool has_undefined;
 };
 std::ostream &operator<<(std::ostream &, varible);
 std::ostream &operator<<(std::ostream &, value);
-// using expression = vector<term>;
-shared_ptr<expression> tokenize(const std::string &expr);
-varible eval(const shared_ptr<expression> &expr, varible var1, varible var2);
+// using _expr = vector<term>;
+expression tokenize(const std::string &expr);
 
 varible pow(varible, varible);
 varible log(varible);
