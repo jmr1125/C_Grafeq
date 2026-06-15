@@ -1,0 +1,422 @@
+#include "value.hpp"
+#include "flint/arb.h"
+#include "flint/arf.h"
+#include "flint/mag.h"
+#include <memory>
+fval::fval() { arf_init(val); }
+fval::fval(double x) { arf_set_d(val, x); }
+fval::fval(const arf_t &x) { arf_set(val, x); }
+fval::~fval() { arf_clear(val); }
+void fval::set_pinf() { arf_pos_inf(val); }
+void fval::set_ninf() { arf_neg_inf(val); }
+void fval::set_nan() { arf_nan(val); }
+
+fball::fball() { arb_init(val); }
+fball::fball(const arf_t &x) {
+  arb_init(val);
+  arb_set_arf(val, x);
+  arb_add_error_2exp_si(val, 0);
+}
+fball::fball(double l, double r) {
+  arb_init(val);
+  arb_set_d(val, (l + r) / 2);
+  arb_add_error_2exp_si(val, 0);
+  mag_t m;
+  mag_init(m);
+  mag_set_d(m, (r - l) / 2);
+  arb_add_error_mag(val, m);
+  mag_clear(m);
+}
+fball::~fball() { arb_clear(val); }
+
+hprange::hprange() {}
+hprange::hprange(const fval &x) { v = x; }
+
+hnrange::hnrange() {}
+hnrange::hnrange(const fval &x) { v = x; }
+infrange::infrange() {}
+
+range::type_t fball::t() { return clse; }
+range::type_t hprange::t() { return pinf; }
+range::type_t hnrange::t() { return ninf; }
+range::type_t infrange::t() { return inf; }
+
+bool isintersect(range &A, range &B) {
+  if (A.t() == range::inf || B.t() == range::inf)
+    return true;
+  if (A.t() == range::clse && B.t() == range::clse) {
+    const fball &a = dynamic_cast<const fball &>(A);
+    const fball &b = dynamic_cast<const fball &>(B);
+    fval al, au, bl, bu;
+    arb_get_interval_arf(al.val, au.val, a.val, 128);
+    arb_get_interval_arf(bl.val, bu.val, b.val, 128);
+    int result = (arf_cmp(al.val, bu.val) <= 0 && arf_cmp(bl.val, au.val) <= 0);
+
+    return result;
+  } else if (A.t() != range::clse && B.t() == range::clse) {
+    return isintersect(B, A);
+  } else if (A.t() == range::clse && B.t() != range::clse) {
+    const fball &a = dynamic_cast<const fball &>(A);
+    fval al, au;
+    arb_get_interval_arf(al.val, au.val, a.val, 128);
+    if (B.t() == range::pinf) {
+      return arf_cmp(au.val, dynamic_cast<const hprange &>(B).v.val) <= 0;
+    } else { // ninf
+      return arf_cmp(al.val, dynamic_cast<const hprange &>(B).v.val) >= 0;
+    }
+  } else if (A.t() == B.t() // && (A.t() == range::pinf || A.t() == range::ninf)
+                            // ofcourse
+  ) {
+    return true;
+  } else { // A.t()!=B.t()
+    if (A.t() == range::pinf) {
+      return arf_cmp(dynamic_cast<const hprange &>(A).v.val,
+                     dynamic_cast<const hnrange &>(B).v.val) <= 0;
+    } else {
+      return isintersect(B, A);
+    }
+  }
+}
+shared_ptr<range> add(shared_ptr<range> A, shared_ptr<range> B) {
+  if (A->t() == range::inf || B->t() == range::inf)
+    return shared_ptr<infrange>();
+  if (A->t() == range::clse && B->t() == range::clse) {
+    shared_ptr<fball> res;
+    arb_add(res->val, dynamic_cast<fball *>(A.get())->val,
+            dynamic_cast<fball *>(B.get())->val, 128);
+    return res;
+  } else if (A->t() != range::clse && B->t() == range::clse) {
+    return add(B, A);
+  } else if (A->t() == range::clse && B->t() != range::clse) {
+    const fball *a = dynamic_cast<const fball *>(A.get());
+    fval al, au;
+    arb_get_interval_arf(al.val, au.val, a->val, 128);
+    if (B->t() == range::pinf) {
+      shared_ptr<hprange> res;
+      arf_add(res.get()->v.val, al.val,
+              dynamic_cast<const hprange *>(B.get())->v.val, 128,
+              ARF_RND_FLOOR);
+      return res;
+    } else { // ninf
+      shared_ptr<hnrange> res;
+      arf_add(res.get()->v.val, au.val,
+              dynamic_cast<const hnrange *>(B.get())->v.val, 128, ARF_RND_CEIL);
+      return res;
+    }
+  } else if (A->t() == B->t() // && (A.t() == range::pinf || A.t() ==
+                              // range::ninf) ofcourse
+  ) {
+    if (A->t() == range::pinf) {
+      shared_ptr<hprange> res;
+      arf_min(res->v.val, dynamic_cast<hprange *>(A.get())->v.val,
+              dynamic_cast<hprange *>(B.get())->v.val);
+      return res;
+    } else {
+      shared_ptr<hnrange> res;
+      arf_max(res->v.val, dynamic_cast<hnrange *>(A.get())->v.val,
+              dynamic_cast<hnrange *>(B.get())->v.val);
+      return res;
+    }
+  } else { // A.t()!=B.t()
+    return shared_ptr<infrange>();
+  }
+  // throw "should not be here";
+}
+shared_ptr<range> opposite(shared_ptr<range> x) {
+  if (x->t() == range::clse) {
+    shared_ptr<fball> res;
+    arb_neg(res->val, dynamic_cast<fball *>(x.get())->val);
+    return res;
+  } else if (x->t() == range::pinf) {
+    return shared_ptr<hnrange>(
+        new hnrange(dynamic_cast<hnrange *>(x.get())->v.val));
+  } else if (x->t() == range::ninf) {
+    return shared_ptr<hnrange>(
+        new hnrange(dynamic_cast<hprange *>(x.get())->v.val));
+  } else {
+    return shared_ptr<infrange>();
+  }
+}
+shared_ptr<range> mul(shared_ptr<range> a, shared_ptr<range> b) {
+  if (a->t() == range::clse && b->t() == range::clse) {
+    shared_ptr<fball> res;
+    arb_mul(res->val, dynamic_cast<fball *>(a.get())->val,
+            dynamic_cast<fball *>(b.get())->val, 128);
+    return res;
+  } else if (a->t() == range::clse && b->t() != range::clse) {
+    if (arb_contains_zero(dynamic_cast<fball *>(a.get())->val)) {
+      return shared_ptr<infrange>();
+    }
+    fval al, au;
+    arb_get_interval_arf(al.val, au.val, dynamic_cast<fball *>(a.get())->val,
+                         128);
+    if (b->t() == range::pinf) {
+      if (arf_sgn(al.val) > 0) {
+        shared_ptr<hprange> res;
+        arf_mul(al.val, al.val, dynamic_cast<hprange *>(b.get())->v.val, 128,
+                ARF_RND_FLOOR);
+        arf_mul(au.val, au.val, dynamic_cast<hprange *>(b.get())->v.val, 128,
+                ARF_RND_FLOOR);
+        arf_min(res->v.val, al.val, au.val);
+        return res;
+      } else {
+        shared_ptr<hnrange> res;
+        arf_mul(al.val, al.val, dynamic_cast<hprange *>(b.get())->v.val, 128,
+                ARF_RND_CEIL);
+        arf_mul(au.val, au.val, dynamic_cast<hprange *>(b.get())->v.val, 128,
+                ARF_RND_CEIL);
+        arf_max(res->v.val, al.val, au.val);
+        return res;
+      }
+    } else {
+      if (arf_sgn(al.val) > 0) {
+        shared_ptr<hnrange> res;
+        arf_mul(al.val, al.val, dynamic_cast<hprange *>(b.get())->v.val, 128,
+                ARF_RND_CEIL);
+        arf_mul(au.val, au.val, dynamic_cast<hprange *>(b.get())->v.val, 128,
+                ARF_RND_CEIL);
+        arf_max(res->v.val, al.val, au.val);
+        return res;
+      } else {
+        shared_ptr<hnrange> res;
+        arf_mul(al.val, al.val, dynamic_cast<hprange *>(b.get())->v.val, 128,
+                ARF_RND_FLOOR);
+        arf_mul(au.val, au.val, dynamic_cast<hprange *>(b.get())->v.val, 128,
+                ARF_RND_FLOOR);
+        arf_min(res->v.val, al.val, au.val);
+        return res;
+      }
+    }
+  } else if (a->t() != range::clse && b->t() == range::clse) {
+    return mul(b, a);
+  } else {
+    if (a->t() == range::inf || b->t() == range::inf) {
+      return shared_ptr<infrange>();
+    }
+    if ((a->t() == range::pinf &&
+         arf_sgn(dynamic_cast<hprange *>(a.get())->v.val) < 0) ||
+        (a->t() == range::ninf &&
+         arf_sgn(dynamic_cast<hnrange *>(a.get())->v.val) > 0) ||
+        (b->t() == range::pinf &&
+         arf_sgn(dynamic_cast<hprange *>(b.get())->v.val) < 0) ||
+        (b->t() == range::ninf &&
+         arf_sgn(dynamic_cast<hnrange *>(b.get())->v.val) > 0)) {
+      return shared_ptr<infrange>();
+    }
+    if ((a->t() == range::pinf &&
+         arf_sgn(dynamic_cast<hprange *>(a.get())->v.val) == 0) ||
+        (a->t() == range::ninf &&
+         arf_sgn(dynamic_cast<hnrange *>(a.get())->v.val) == 0) ||
+        (b->t() == range::pinf &&
+         arf_sgn(dynamic_cast<hprange *>(b.get())->v.val) == 0) ||
+        (b->t() == range::ninf &&
+         arf_sgn(dynamic_cast<hnrange *>(b.get())->v.val) == 0)) {
+      if (a->t() == b->t()) {
+        return shared_ptr<hprange>();
+      } else {
+        return shared_ptr<hnrange>();
+      }
+    }
+    if (a->t() == range::pinf) {
+      shared_ptr<hnrange> res;
+      arf_mul(res->v.val, dynamic_cast<hprange *>(a.get())->v.val,
+              dynamic_cast<hnrange *>(b.get())->v.val, 128, ARF_RND_CEIL);
+      return res;
+    } else {
+      return mul(b, a);
+    }
+  }
+}
+varible reciprocal(shared_ptr<range> x) {
+  if (x->t() == range::clse) {
+    varible res;
+    fval al, au;
+    arb_get_interval_arf(al.val, au.val, dynamic_cast<fball *>(x.get())->val,
+                         128);
+    if (arf_sgn(au.val) == 0) {
+      arf_si_div(al.val, 1, al.val, 128, ARF_RND_CEIL);
+      dynamic_cast<hnrange *>(res.r.back().get())->v = al;
+      res.r.push_back(shared_ptr<hprange>());
+      return res;
+    }
+    if (arf_sgn(al.val) < 0 && arf_sgn(au.val) > 0) {
+      arf_si_div(al.val, 1, al.val, 128, ARF_RND_CEIL);
+      arf_si_div(au.val, 1, au.val, 128, ARF_RND_FLOOR);
+      res.r.push_back(shared_ptr<hnrange>());
+      dynamic_cast<hnrange *>(res.r.back().get())->v = al;
+      res.r.push_back(shared_ptr<hprange>());
+      dynamic_cast<hnrange *>(res.r.back().get())->v = au;
+      return res;
+    }
+    if (arf_sgn(al.val) == 0) {
+      arf_si_div(au.val, 1, au.val, 128, ARF_RND_FLOOR);
+      res.r.push_back(shared_ptr<hprange>());
+      dynamic_cast<hnrange *>(res.r.back().get())->v = au;
+      return res;
+    }
+    res.r.push_back(shared_ptr<fball>());
+    arb_ui_div(dynamic_cast<fball *>(res.r[0].get())->val, 1,
+               dynamic_cast<fball *>(x.get())->val, 128);
+    return res;
+  }
+  if ((x->t() == range::ninf &&
+       arf_sgn(dynamic_cast<hnrange *>(x.get())->v.val) < 0) ||
+      (x->t() == range::pinf &&
+       arf_sgn(dynamic_cast<hnrange *>(x.get())->v.val) > 0)) {
+    varible res;
+    res.r.push_back(shared_ptr<fball>());
+    arb_unit_interval(dynamic_cast<fball *>(res.r[0].get())->val);
+    arb_div_arf(dynamic_cast<fball *>(res.r[0].get())->val,
+                dynamic_cast<fball *>(res.r[0].get())->val,
+                dynamic_cast<hnrange *>(x.get())->v.val, 128);
+    return res;
+  }
+  if (x->t() == range::ninf &&
+      arf_sgn(dynamic_cast<hnrange *>(x.get())->v.val) == 0) {
+    varible res;
+    res.r.push_back(shared_ptr<hnrange>());
+    arf_zero(dynamic_cast<hnrange *>(res.r[0].get())->v.val);
+    return res;
+  }
+  if (x->t() == range::ninf &&
+      arf_sgn(dynamic_cast<hnrange *>(x.get())->v.val) > 0) {
+    varible res;
+    res.r.push_back(shared_ptr<hnrange>());
+    arf_zero(dynamic_cast<hnrange *>(res.r[0].get())->v.val);
+    res.r.push_back(shared_ptr<hprange>());
+    arf_si_div(dynamic_cast<hprange *>(res.r[1].get())->v.val, 1,
+               dynamic_cast<hnrange *>(x.get())->v.val, 128, ARF_RND_DOWN);
+    return res;
+  }
+  if (x->t() == range::pinf &&
+      arf_sgn(dynamic_cast<hprange *>(x.get())->v.val) < 0) {
+    varible res;
+    res.r.push_back(shared_ptr<hprange>());
+    arf_zero(dynamic_cast<hprange *>(res.r[0].get())->v.val);
+    res.r.push_back(shared_ptr<hnrange>());
+    arf_si_div(dynamic_cast<hnrange *>(res.r[1].get())->v.val, 1,
+               dynamic_cast<hprange *>(x.get())->v.val, 128, ARF_RND_UP);
+    return res;
+  }
+  if (x->t() == range::pinf &&
+      arf_sgn(dynamic_cast<hprange *>(x.get())->v.val) == 0) {
+    varible res;
+    res.r.push_back(shared_ptr<hprange>());
+    arf_zero(dynamic_cast<hprange *>(res.r[0].get())->v.val);
+    return res;
+  }
+  if (x->t() == range::inf) {
+    varible res;
+    res.r.push_back(shared_ptr<infrange>());
+    return res;
+  }
+}
+
+shared_ptr<range> sin(shared_ptr<range> x) {
+  shared_ptr<fball> res;
+  if (x->t() == range::clse) {
+    arb_sin(res->val, dynamic_cast<fball *>(x.get())->val, 128);
+  } else {
+    arb_zero_pm_one(res->val);
+  }
+  return res;
+}
+shared_ptr<range> cos(shared_ptr<range> x) {
+  shared_ptr<fball> res;
+  if (x->t() == range::clse) {
+    arb_cos(res->val, dynamic_cast<fball *>(x.get())->val, 128);
+  } else {
+    arb_zero_pm_one(res->val);
+  }
+  return res;
+}
+varible log(shared_ptr<range> x) {
+  if (x->t() == range::inf) {
+    return varible({shared_ptr<infrange>()});
+  }
+  if (x->t() == range::clse) {
+    fval al, au;
+    arb_get_interval_arf(al.val, au.val, dynamic_cast<fball *>(x.get())->val,
+                         128);
+    if (arf_sgn(au.val) <= 0) {
+      return varible();
+    }
+    if (arf_sgn(al.val) <= 0) {
+      varible res;
+      res.r.push_back(shared_ptr<hnrange>());
+      fball t(au.val);
+      arb_log(t.val, t.val, 128);
+      arf_set(dynamic_cast<hnrange *>(res.r[0].get())->v.val,
+              arb_midref(t.val));
+      return res;
+    }
+    varible res;
+    res.r.push_back(shared_ptr<fball>());
+    arb_log(dynamic_cast<fball *>(res.r[0].get())->val,
+            dynamic_cast<fball *>(res.r[0].get())->val, 128);
+    return res;
+  }
+  if (x->t() == range::ninf) {
+    if (arf_sgn(dynamic_cast<hnrange *>(x.get())->v.val) <= 0) {
+      return varible();
+    } else {
+      varible res;
+      res.r.push_back(shared_ptr<hnrange>());
+      fball t(dynamic_cast<hnrange *>(x.get())->v.val);
+      arb_log(t.val, t.val, 128);
+      arf_set(dynamic_cast<hnrange *>(res.r[0].get())->v.val,
+              arb_midref(t.val));
+      return res;
+    }
+  }
+  if (x->t() == range::pinf) {
+    if (arf_sgn(dynamic_cast<hprange *>(x.get())->v.val) <= 0) {
+      return varible({shared_ptr<infrange>()});
+    } else {
+      varible res;
+      res.r.push_back(shared_ptr<hprange>());
+      fball t(dynamic_cast<hprange *>(x.get())->v.val);
+      arb_log(t.val, t.val, 128);
+      arf_set(dynamic_cast<hprange *>(res.r[0].get())->v.val,
+              arb_midref(t.val));
+      return res;
+    }
+  }
+}
+shared_ptr<range> exp(shared_ptr<range> x) {
+  if (x->t() == range::inf) {
+    return shared_ptr<hprange>();
+  }
+  if (x->t() == range::clse) {
+    shared_ptr<fball> res;
+    arb_exp(res->val, dynamic_cast<fball *>(x.get())->val, 128);
+    return res;
+  }
+  if (x->t() == range::pinf) {
+    fball t(dynamic_cast<hprange *>(x.get())->v.val);
+    shared_ptr<hprange> res;
+    arb_exp(t.val, t.val, 128);
+    arf_set(res->v.val, arb_midref(t.val));
+    return res;
+  }
+  if (x->t() == range::ninf) {
+    fball t(dynamic_cast<hprange *>(x.get())->v.val);
+    shared_ptr<fball> res;
+    arb_unit_interval(res->val);
+    arb_exp(t.val, t.val, 128);
+    arb_mul(res->val, res->val, t.val, 128);
+    return res;
+  }
+}
+varible pow(shared_ptr<range> x, shared_ptr<range> y) {
+  if (x->t() == range::inf)
+    return varible({shared_ptr<infrange>()});
+  if (x->t() == range::clse) {
+    
+  }
+  if (x->t() == range::pinf) {
+  }
+  if (x->t() == range::ninf) {
+  }
+}
+varible tan(shared_ptr<range> x) { return mul(sin(x), reciprocal(cos(x))); }

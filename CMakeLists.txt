@@ -32,9 +32,22 @@ include_directories(${GLEW_INCLUDE_DIRS})
 #include_directories(${OpenCL_INCLUDE_DIRS})
 #  link_libraries(${OpenCL_LIBRARY})
 
+find_package(PkgConfig REQUIRED)
 
-add_executable(${PROJECT_NAME} main.cpp eval.cpp)
-target_link_libraries(${PROJECT_NAME} glfw OpenGL::GL GLEW::GLEW)
-add_executable(testeval testeval.cpp eval.cpp)
+pkg_check_modules(FLINT REQUIRED flint)
+
+
+add_executable(${PROJECT_NAME} main.cpp value.cpp)
+target_link_directories(${PROJECT_NAME} PRIVATE ${FLINT_LIBRARY_DIRS})
+target_link_libraries(${PROJECT_NAME} glfw OpenGL::GL GLEW::GLEW ${FLINT_LIBRARIES})
+
+include_directories(test1 PRIVATE ${FLINT_INCLUDE_DIRS})
+
+#add_executable(testeval testeval.cpp eval.cpp)
 add_executable(genExpr genexpr.cpp)
 #target_link_libraries(${PROJECT_NAME} OpenMP::OpenMP_CXX)
+
+add_executable(test1 test1.cpp)
+target_link_directories(test1 PRIVATE ${FLINT_LIBRARY_DIRS})
+target_link_libraries(test1 PRIVATE ${FLINT_LIBRARIES})
+

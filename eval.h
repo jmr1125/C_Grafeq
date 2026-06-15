@@ -2,6 +2,7 @@
 #include <ostream>
 #include <utility>
 #include <vector>
+
 using std::pair;
 using std::shared_ptr;
 using std::vector;
@@ -101,37 +102,37 @@ struct CONSTANT : public _expr {
                        const vector<shared_ptr<_expr>> &) const override;
   double l;
 };
-struct value {
+struct fval {
   enum type_t { normal, inf, ninf };
-  value() : v(0), type(normal){};
-  value(double x) : v(x), type(normal){};
-  value(double x, type_t t) : v(x), type(t){};
+  fval() : v(0), type(normal){};
+  fval(double x) : v(x), type(normal){};
+  fval(double x, type_t t) : v(x), type(t){};
   double v;
   type_t type;
-  value operator+(value) const;
-  value operator-(value) const;
-  value operator-() const;
-  value operator*(value) const;
-  value operator/(value) const;
-  bool operator>(value) const;
-  bool operator==(value) const;
-  bool operator<(value) const;
-  bool operator>=(value) const;
-  bool operator<=(value) const;
-  bool operator!=(value) const;
+  fval operator+(fval) const;
+  fval operator-(fval) const;
+  fval operator-() const;
+  fval operator*(fval) const;
+  fval operator/(fval) const;
+  bool operator>(fval) const;
+  bool operator==(fval) const;
+  bool operator<(fval) const;
+  bool operator>=(fval) const;
+  bool operator<=(fval) const;
+  bool operator!=(fval) const;
 };
 struct varible {
   varible() = default;
-  varible(pair<value, value> r) : ranges(r), has_undefined(false){};
-  varible(value x) : ranges({std::make_pair(x, x)}), has_undefined(false){};
-  varible(value l, value r)
+  varible(pair<fval, fval> r) : ranges(r), has_undefined(false){};
+  varible(fval x) : ranges({std::make_pair(x, x)}), has_undefined(false){};
+  varible(fval l, fval r)
       : ranges({std::make_pair(l, r)}), has_undefined(false){};
   void sort();
-  pair<value, value> ranges;
+  pair<fval, fval> ranges;
   bool has_undefined;
 };
 std::ostream &operator<<(std::ostream &, varible);
-std::ostream &operator<<(std::ostream &, value);
+std::ostream &operator<<(std::ostream &, fval);
 // using _expr = vector<term>;
 expression tokenize(const std::string &expr);
 
