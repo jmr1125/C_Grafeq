@@ -1,9 +1,5 @@
-CMakeFiles/C_GrafEQ.dir/value.cpp.o: \
-  /Users/jiang/Desktop/C_GrafEq/value.cpp \
-  /Users/jiang/Desktop/C_GrafEq/value.hpp \
-  /opt/homebrew/Cellar/flint/3.5.0/include/flint/arb.h \
-  /opt/homebrew/Cellar/flint/3.5.0/include/flint/arf.h \
-  /opt/homebrew/Cellar/gmp/6.3.0/include/gmp.h \
+CMakeFiles/test2.dir/test2.cpp.o: /Users/jiang/Desktop/C_GrafEq/test2.cpp \
+  /opt/homebrew/include/flint/arf.h /opt/homebrew/include/gmp.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/iosfwd \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__config_site \
@@ -85,8 +81,8 @@ CMakeFiles/C_GrafEQ.dir/value.cpp.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/arm/limits.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/arm/_limits.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/syslimits.h \
-  /opt/homebrew/Cellar/flint/3.5.0/include/flint/longlong.h \
-  /opt/homebrew/Cellar/flint/3.5.0/include/flint/flint.h \
+  /opt/homebrew/include/flint/longlong.h \
+  /opt/homebrew/include/flint/flint.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include/stdarg.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include/__stdarg_header_macro.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include/__stdarg___gnuc_va_list.h \
@@ -94,16 +90,18 @@ CMakeFiles/C_GrafEQ.dir/value.cpp.o: \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include/__stdarg_va_arg.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include/__stdarg___va_copy.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include/__stdarg_va_copy.h \
-  /opt/homebrew/Cellar/flint/3.5.0/include/flint/flint-config.h \
-  /opt/homebrew/Cellar/flint/3.5.0/include/flint/longlong_asm_clang.h \
-  /opt/homebrew/Cellar/flint/3.5.0/include/flint/longlong_asm_gnu.h \
-  /opt/homebrew/Cellar/flint/3.5.0/include/flint/longlong_div_gnu.h \
-  /opt/homebrew/Cellar/flint/3.5.0/include/flint/mag.h \
-  /opt/homebrew/Cellar/flint/3.5.0/include/flint/fmpz_extras.h \
-  /opt/homebrew/Cellar/flint/3.5.0/include/flint/fmpz.h \
-  /opt/homebrew/Cellar/flint/3.5.0/include/flint/fmpz_types.h \
-  /opt/homebrew/Cellar/flint/3.5.0/include/flint/arb_types.h \
-  /opt/homebrew/Cellar/flint/3.5.0/include/flint/arf_types.h \
+  /opt/homebrew/include/flint/flint-config.h \
+  /opt/homebrew/include/flint/longlong_asm_clang.h \
+  /opt/homebrew/include/flint/longlong_asm_gnu.h \
+  /opt/homebrew/include/flint/longlong_div_gnu.h \
+  /opt/homebrew/include/flint/mag.h \
+  /opt/homebrew/include/flint/fmpz_extras.h \
+  /opt/homebrew/include/flint/fmpz.h \
+  /opt/homebrew/include/flint/fmpz_types.h \
+  /opt/homebrew/include/flint/arb_types.h \
+  /opt/homebrew/include/flint/arf_types.h \
+  /Users/jiang/Desktop/C_GrafEq/value.hpp \
+  /opt/homebrew/include/flint/arb.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/memory \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__memory/addressof.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__memory/align.h \

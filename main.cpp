@@ -1,4 +1,4 @@
-#include "eval.h"
+#include "flint/arf.h"
 #include <algorithm>
 #include <atomic>
 #include <chrono>
@@ -9,6 +9,7 @@
 #include <queue>
 #include <utility>
 #define GL_SILENCE_DEPRECATION
+#include "value.hpp"
 #include <GLFW/glfw3.h>
 #include <cstdlib>
 #include <fstream>
@@ -60,8 +61,8 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action,
     glfwSetWindowShouldClose(window, GLFW_TRUE);
 } // example expr   xv 30 mSv 0.2 mv 0.4 ays
 int main(int argc, char **argv) {
-  int scr_size;
-  cin >> scr_size;
+  int scr_size = 512;
+  // cin >> scr_size;
 
   if (!glfwInit()) {
     std::cerr << "Failed to initialize GLFW" << std::endl;
@@ -145,9 +146,104 @@ int main(int argc, char **argv) {
   glVertexAttribPointer(vTexCoordLocation, 2, GL_FLOAT, GL_FALSE,
                         4 * sizeof(GLfloat), (void *)(2 * sizeof(GLfloat)));
 
+  thread calc_th([&]() {
+    for (int i = 0; i < scr_size; ++i)
+      for (int j = 0; j < scr_size; ++j) {
+        image[(i * scr_size + j) * 3 + 0] = 255;
+        image[(i * scr_size + j) * 3 + 1] = 0;
+        image[(i * scr_size + j) * 3 + 2] = 0;
+      }
+    int k = log2(scr_size);
+    vector<pair<range, range>> U, U1;
+    double xmin = -4, xmax = 4, ymin = -4, ymax = 4;
+    {
+      fval xl, xh, yl, yh;
+      arf_set_d(xl.val, xmin);
+      arf_set_d(xh.val, xmax);
+      arf_set_d(yl.val, ymin);
+      arf_set_d(yh.val, ymax);
+      U1.push_back(pair<range, range>());
+      arf_set(U1[0].first.lo.val, xl.val);
+      arf_set(U1[0].first.hi.val, xh.val);
+      arf_set(U1[0].second.lo.val, yl.val);
+      arf_set(U1[0].second.hi.val, yh.val);
+    }
+    while (k >= 0 && !U1.empty()) {
+      swap(U, U1);
+      U1.clear();
+      for (const auto &u : U) {
+        int xl = (arf_get_d(u.first.lo.val, ARF_RND_NEAR) - xmin) /
+                 (xmax - xmin) * scr_size;
+        int xh = (arf_get_d(u.first.hi.val, ARF_RND_NEAR) - xmin) /
+                 (xmax - xmin) * scr_size;
+        int yl = (arf_get_d(u.second.lo.val, ARF_RND_NEAR) - ymin) /
+                 (ymax - ymin) * scr_size;
+        int yh = (arf_get_d(u.second.hi.val, ARF_RND_NEAR) - ymin) /
+                 (ymax - ymin) * scr_size;
+        varible x({u.first}), y({u.second});
+        // auto val = add(pow(x, x), neg(y));
+        varible two;
+        two.r.push_back(range());
+        arf_set_d(two.r[0].lo.val, 2);
+        arf_set_d(two.r[0].hi.val, 2);
+        // auto val = add(pow(x, two), neg(y)); two=2,0.5
+        auto val = add(mul(x, y), two);
+        bool t = false, f = true;
+        for (const auto &r : val.r) {
+          if (arf_sgn(r.lo.val) >= 0) {
+            t = true;
+          }
+          if (arf_sgn(r.hi.val) >= 0) {
+            f = false;
+          }
+        }
+        cout << xl << ' ' << xh << ' ' << yl << ' ' << yh << endl;
+        cout << x << ' ' << y << " => " << val << " " << t << " " << f << endl;
+        if (t) {
+          for (int i = yl; i < yh; ++i)
+            for (int j = xl; j < xh; ++j) {
+              image[(i * scr_size + j) * 3 + 0] = 0;
+              image[(i * scr_size + j) * 3 + 1] = 0;
+              image[(i * scr_size + j) * 3 + 2] = 0;
+            }
+        } else if (f) {
+          for (int i = yl; i < yh; ++i)
+            for (int j = xl; j < xh; ++j) {
+              image[(i * scr_size + j) * 3 + 0] = 255;
+              image[(i * scr_size + j) * 3 + 1] = 255;
+              image[(i * scr_size + j) * 3 + 2] = 255;
+            }
+        } else {
+          fval xm, ym;
+          arf_add(xm.val, u.first.lo.val, u.first.hi.val, 128, ARF_RND_NEAR);
+          arf_div_ui(xm.val, xm.val, 2, 128, ARF_RND_NEAR);
+          arf_add(ym.val, u.second.lo.val, u.second.hi.val, 128, ARF_RND_NEAR);
+          arf_div_ui(ym.val, ym.val, 2, 128, ARF_RND_NEAR);
+          for (int i = 0; i < 4; ++i) {
+            U1.push_back(pair<range, range>());
+            if (i / 2) {
+              arf_set(U1.back().first.lo.val, u.first.lo.val);
+              arf_set(U1.back().first.hi.val, xm.val);
+            } else {
+              arf_set(U1.back().first.lo.val, xm.val);
+              arf_set(U1.back().first.hi.val, u.first.hi.val);
+            }
+            if (i % 2) {
+              arf_set(U1.back().second.lo.val, u.second.lo.val);
+              arf_set(U1.back().second.hi.val, ym.val);
+            } else {
+              arf_set(U1.back().second.lo.val, ym.val);
+              arf_set(U1.back().second.hi.val, u.second.hi.val);
+            }
+          }
+        }
+      }
+      k--;
+    }
+  });
   while (!glfwWindowShouldClose(window)) {
     glBindTexture(GL_TEXTURE_2D, texture);
-    
+
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, scr_size, scr_size, 0, GL_RGB,
                  GL_UNSIGNED_BYTE, image.data());
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -161,7 +257,7 @@ int main(int argc, char **argv) {
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
-
+  calc_th.join();
   glfwDestroyWindow(window);
   glfwTerminate();
   return 0;

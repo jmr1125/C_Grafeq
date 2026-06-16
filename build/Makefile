@@ -155,6 +155,19 @@ test1/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test1.dir/build.make CMakeFiles/test1.dir/build
 .PHONY : test1/fast
 
+#=============================================================================
+# Target rules for targets named test2
+
+# Build rule for target.
+test2: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test2
+.PHONY : test2
+
+# fast build rule for target.
+test2/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test2.dir/build.make CMakeFiles/test2.dir/build
+.PHONY : test2/fast
+
 genexpr.o: genexpr.cpp.o
 .PHONY : genexpr.o
 
@@ -227,12 +240,38 @@ test1.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test1.dir/build.make CMakeFiles/test1.dir/test1.cpp.s
 .PHONY : test1.cpp.s
 
+test2.o: test2.cpp.o
+.PHONY : test2.o
+
+# target to build an object file
+test2.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test2.dir/build.make CMakeFiles/test2.dir/test2.cpp.o
+.PHONY : test2.cpp.o
+
+test2.i: test2.cpp.i
+.PHONY : test2.i
+
+# target to preprocess a source file
+test2.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test2.dir/build.make CMakeFiles/test2.dir/test2.cpp.i
+.PHONY : test2.cpp.i
+
+test2.s: test2.cpp.s
+.PHONY : test2.s
+
+# target to generate assembly for a file
+test2.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test2.dir/build.make CMakeFiles/test2.dir/test2.cpp.s
+.PHONY : test2.cpp.s
+
 value.o: value.cpp.o
 .PHONY : value.o
 
 # target to build an object file
 value.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/C_GrafEQ.dir/build.make CMakeFiles/C_GrafEQ.dir/value.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test1.dir/build.make CMakeFiles/test1.dir/value.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test2.dir/build.make CMakeFiles/test2.dir/value.cpp.o
 .PHONY : value.cpp.o
 
 value.i: value.cpp.i
@@ -241,6 +280,8 @@ value.i: value.cpp.i
 # target to preprocess a source file
 value.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/C_GrafEQ.dir/build.make CMakeFiles/C_GrafEQ.dir/value.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test1.dir/build.make CMakeFiles/test1.dir/value.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test2.dir/build.make CMakeFiles/test2.dir/value.cpp.i
 .PHONY : value.cpp.i
 
 value.s: value.cpp.s
@@ -249,6 +290,8 @@ value.s: value.cpp.s
 # target to generate assembly for a file
 value.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/C_GrafEQ.dir/build.make CMakeFiles/C_GrafEQ.dir/value.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test1.dir/build.make CMakeFiles/test1.dir/value.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test2.dir/build.make CMakeFiles/test2.dir/value.cpp.s
 .PHONY : value.cpp.s
 
 # Help Target
@@ -262,6 +305,7 @@ help:
 	@echo "... C_GrafEQ"
 	@echo "... genExpr"
 	@echo "... test1"
+	@echo "... test2"
 	@echo "... genexpr.o"
 	@echo "... genexpr.i"
 	@echo "... genexpr.s"
@@ -271,6 +315,9 @@ help:
 	@echo "... test1.o"
 	@echo "... test1.i"
 	@echo "... test1.s"
+	@echo "... test2.o"
+	@echo "... test2.i"
+	@echo "... test2.s"
 	@echo "... value.o"
 	@echo "... value.i"
 	@echo "... value.s"

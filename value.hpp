@@ -1,6 +1,7 @@
 #include <flint/arb.h>
 #include <flint/flint.h>
 #include <memory>
+#include <ostream>
 #include <vector>
 using std::shared_ptr;
 using std::vector;
@@ -12,51 +13,44 @@ struct fval {
   void set_pinf();
   void set_ninf();
   void set_nan();
-  void pinf() const;
-  void ninf() const;
-  void nan() const;
+  bool pinf() const;
+  bool ninf() const;
+  bool nan() const;
   arf_t val;
+  bool operator<(const fval &) const;
+  bool operator==(const fval &) const;
+  bool operator>(const fval &) const;
 };
 struct range {
-  enum type_t { clse, pinf, ninf, inf };
-  virtual type_t t() = 0;
-};
-struct fball : public range {
-  fball();
-  fball(double, double);
-  fball(const arf_t &);
-  virtual ~fball();
-  virtual type_t t() override;
-  arb_t val;
-};
-struct hprange : public range {
-  hprange();
-  hprange(const fval &);
-  virtual type_t t() override;
-  fval v;
-};
-struct hnrange : public range {
-  hnrange();
-  hnrange(const fval &);
-  virtual type_t t() override;
-  fval v;
-};
-struct infrange : public range {
-  infrange();
-  virtual type_t t() override;
+  fval hi, lo;
 };
 struct varible {
-  std::vector<std::shared_ptr<range>> r;
+  std::vector<range> r;
 };
 bool isintersect(const range &, const range &);
-shared_ptr<range> add(shared_ptr<range>, shared_ptr<range>);
-shared_ptr<range> opposite(shared_ptr<range>);
-shared_ptr<range> mul(shared_ptr<range>, shared_ptr<range>);
-varible reciprocal(shared_ptr<range>);
+range add(const range &, const range &);
+range neg(const range &);
+range mul(const range &, const range &);
+varible reciprocal(const range &);
 
-shared_ptr<range> sin(shared_ptr<range>);
-shared_ptr<range> cos(shared_ptr<range>);
-varible tan(shared_ptr<range>);
-varible log(shared_ptr<range>);
-shared_ptr<range> exp(shared_ptr<range>);
-varible pow(shared_ptr<range>, shared_ptr<range>);
+range sin(const range &);
+range cos(const range &);
+varible tan(const range &);
+varible log(const range &);
+range exp(const range &);
+varible pow(const range &, const range &);
+
+varible Union(const varible &, const varible &);
+varible add(varible, varible);
+varible neg(varible);
+varible mul(varible, varible);
+varible reciprocal(varible);
+varible sin(varible);
+varible cos(varible);
+varible tan(varible);
+varible log(varible);
+varible exp(varible);
+varible pow(varible, varible);
+
+std::ostream &operator<<(std::ostream &, const range &);
+std::ostream &operator<<(std::ostream &, const varible &);

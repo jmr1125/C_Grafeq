@@ -8,8 +8,8 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/Users/jiang/Desktop/C_GrafEq/test1.cpp" "CMakeFiles/test1.dir/test1.cpp.o" "gcc" "CMakeFiles/test1.dir/test1.cpp.o.d"
-  "/Users/jiang/Desktop/C_GrafEq/value.cpp" "CMakeFiles/test1.dir/value.cpp.o" "gcc" "CMakeFiles/test1.dir/value.cpp.o.d"
+  "/Users/jiang/Desktop/C_GrafEq/test2.cpp" "CMakeFiles/test2.dir/test2.cpp.o" "gcc" "CMakeFiles/test2.dir/test2.cpp.o.d"
+  "/Users/jiang/Desktop/C_GrafEq/value.cpp" "CMakeFiles/test2.dir/value.cpp.o" "gcc" "CMakeFiles/test2.dir/value.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

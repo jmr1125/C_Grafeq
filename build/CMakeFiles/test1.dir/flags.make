@@ -4,9 +4,9 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/opt/homebrew/include -I/Users/jiang/Desktop/C_GrafEq/test1 -I/Users/jiang/Desktop/C_GrafEq/PRIVATE -I/opt/homebrew/Cellar/flint/3.5.0/include -I/opt/homebrew/Cellar/gmp/6.3.0/include -I/opt/homebrew/Cellar/mpfr/4.2.2/include
+CXX_INCLUDES = -I/opt/homebrew/include -I/opt/homebrew/Cellar/flint/3.5.0/include -I/opt/homebrew/Cellar/gmp/6.3.0/include -I/opt/homebrew/Cellar/mpfr/4.2.2/include
 
-CXX_FLAGSarm64 = -std=gnu++20 -arch arm64
+CXX_FLAGSarm64 = -g -std=gnu++20 -arch arm64
 
-CXX_FLAGS = -std=gnu++20 -arch arm64
+CXX_FLAGS = -g -std=gnu++20 -arch arm64
 
