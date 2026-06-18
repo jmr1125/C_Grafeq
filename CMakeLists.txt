@@ -37,7 +37,7 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(FLINT REQUIRED flint)
 
 
-add_executable(${PROJECT_NAME} main.cpp value.cpp)
+add_executable(${PROJECT_NAME} main.cpp value.cpp prog.cpp)
 target_link_directories(${PROJECT_NAME} PRIVATE ${FLINT_LIBRARY_DIRS})
 target_link_libraries(${PROJECT_NAME} glfw OpenGL::GL GLEW::GLEW ${FLINT_LIBRARIES})
 

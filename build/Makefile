@@ -216,6 +216,30 @@ main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/C_GrafEQ.dir/build.make CMakeFiles/C_GrafEQ.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+prog.o: prog.cpp.o
+.PHONY : prog.o
+
+# target to build an object file
+prog.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/C_GrafEQ.dir/build.make CMakeFiles/C_GrafEQ.dir/prog.cpp.o
+.PHONY : prog.cpp.o
+
+prog.i: prog.cpp.i
+.PHONY : prog.i
+
+# target to preprocess a source file
+prog.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/C_GrafEQ.dir/build.make CMakeFiles/C_GrafEQ.dir/prog.cpp.i
+.PHONY : prog.cpp.i
+
+prog.s: prog.cpp.s
+.PHONY : prog.s
+
+# target to generate assembly for a file
+prog.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/C_GrafEQ.dir/build.make CMakeFiles/C_GrafEQ.dir/prog.cpp.s
+.PHONY : prog.cpp.s
+
 test1.o: test1.cpp.o
 .PHONY : test1.o
 
@@ -312,6 +336,9 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... prog.o"
+	@echo "... prog.i"
+	@echo "... prog.s"
 	@echo "... test1.o"
 	@echo "... test1.i"
 	@echo "... test1.s"

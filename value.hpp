@@ -1,3 +1,4 @@
+#pragma once
 #include <flint/arb.h>
 #include <flint/flint.h>
 #include <memory>

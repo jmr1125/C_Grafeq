@@ -333,7 +333,7 @@ varible pow(const range &a, const range &b) {
       res.cont = {false, false};
       return res;
     }
-    if (arf_sgn(a.lo.val) <= 0) {
+    if (arf_sgn(a.lo.val) < 0) {
       const auto h = ppow(a.hi, b.lo);
       varible res;
       res.r.push_back(range());
