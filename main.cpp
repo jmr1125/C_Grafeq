@@ -4,6 +4,7 @@
 #include <chrono>
 #include <cstddef>
 #include <cstdio>
+#include <functional>
 #include <mutex>
 #include <ostream>
 #include <queue>
@@ -155,7 +156,7 @@ int main(int argc, char **argv) {
       }
     int k = log2(scr_size);
     vector<pair<range, range>> U, U1;
-    double xmin = -4, xmax = 4, ymin = -4, ymax = 4;
+    double xmin = -10, xmax = 10, ymin = -10, ymax = 10;
     {
       fval xl, xh, yl, yh;
       arf_set_d(xl.val, xmin);
@@ -168,6 +169,27 @@ int main(int argc, char **argv) {
       arf_set(U1[0].second.lo.val, yl.val);
       arf_set(U1[0].second.hi.val, yh.val);
     }
+    auto func = [](const varible &x, const varible &y) {
+      // auto val = add(mul(x, y), x);
+      // auto val = add(sin(mul(x, y)), sin(x));
+      // auto val = add(pow(x, x), neg(y));
+      varible two;
+      two.r.push_back(range());
+      arf_set_d(two.r[0].lo.val, 2);
+      arf_set_d(two.r[0].hi.val, 2);
+      varible half;
+      half.r.push_back(range());
+      arf_set_d(half.r[0].lo.val, .5);
+      arf_set_d(half.r[0].hi.val, .5);
+      //  auto val = add(neg(y), pow(x, x));
+      auto val = add(neg(y), reciprocal(add(x, two)));
+      // auto val = add(neg(y), add(log(cos(x)), pow(mul(x, x), half)));
+      //  auto val = add(neg(exp(add(sin(x), cos(y)))), sin(exp(add(x, y))));
+      //  auto val = add(x, y);
+      //  auto val = add(x, log(y));
+      //  auto val = add(sin(x), sin(y));
+      return val;
+    };
     while (k >= 0 && !U1.empty()) {
       swap(U, U1);
       U1.clear();
@@ -180,33 +202,17 @@ int main(int argc, char **argv) {
                  (ymax - ymin) * scr_size;
         int yh = (arf_get_d(u.second.hi.val, ARF_RND_NEAR) - ymin) /
                  (ymax - ymin) * scr_size;
-        varible x({u.first}), y({u.second});
-        // auto val = add(pow(x, x), neg(y));
-        varible two;
-        two.r.push_back(range());
-        arf_set_d(two.r[0].lo.val, 2);
-        arf_set_d(two.r[0].hi.val, 2);
-        // auto val = add(pow(x, two), neg(y)); two=2,0.5
-        auto val = add(mul(x, y), two);
-        bool t = false, f = true;
+        varible x(u.first), y(u.second);
+        auto val = func(x, y);
+        bool f = true;
         for (const auto &r : val.r) {
-          if (arf_sgn(r.lo.val) >= 0) {
-            t = true;
-          }
-          if (arf_sgn(r.hi.val) >= 0) {
+          if (arf_sgn(r.hi.val) >= 0 && arf_sgn(r.lo.val) <= 0) {
             f = false;
           }
         }
-        cout << xl << ' ' << xh << ' ' << yl << ' ' << yh << endl;
-        cout << x << ' ' << y << " => " << val << " " << t << " " << f << endl;
-        if (t) {
-          for (int i = yl; i < yh; ++i)
-            for (int j = xl; j < xh; ++j) {
-              image[(i * scr_size + j) * 3 + 0] = 0;
-              image[(i * scr_size + j) * 3 + 1] = 0;
-              image[(i * scr_size + j) * 3 + 2] = 0;
-            }
-        } else if (f) {
+        // cout << xl << ' ' << xh << ' ' << yl << ' ' << yh << endl;
+        // cout << x << ' ' << y << " => " << val << " " << f << endl;
+        if (f) {
           for (int i = yl; i < yh; ++i)
             for (int j = xl; j < xh; ++j) {
               image[(i * scr_size + j) * 3 + 0] = 255;
@@ -240,6 +246,118 @@ int main(int argc, char **argv) {
       }
       k--;
     }
+    cout << "px done" << endl;
+    vector<int> root_cnt(scr_size * scr_size, 0);
+    for (const auto &u : U1) {
+      const double xx0 = arf_get_d(u.first.lo.val, ARF_RND_FLOOR),
+                   yy0 = arf_get_d(u.second.lo.val, ARF_RND_FLOOR);
+      const int x0 = (xx0 - xmin) / (xmax - xmin) * scr_size;
+      const int y0 = (yy0 - ymin) / (ymax - ymin) * scr_size;
+      root_cnt[y0 * scr_size + x0]++;
+    }
+    while (!U1.empty()) {
+      swap(U, U1);
+      U1.clear();
+      for (const auto &u : U) {
+        int x0 = (arf_get_d(u.first.lo.val, ARF_RND_FLOOR) - xmin) /
+                 (xmax - xmin) * scr_size;
+        int y0 = (arf_get_d(u.second.lo.val, ARF_RND_FLOOR) - ymin) /
+                 (ymax - ymin) * scr_size;
+        if (root_cnt[y0 * scr_size + x0] < 0)
+          continue;
+        varible x(u.first), y(u.second);
+        auto val = func(x, y);
+        bool f = true;
+        for (const auto &r : val.r) {
+          if (arf_sgn(r.hi.val) >= 0 && arf_sgn(r.lo.val) <= 0) {
+            f = false;
+          }
+        }
+        // cout << xl << ' ' << xh << ' ' << yl << ' ' << yh << endl;
+        // cout << x << ' ' << y << " => " << val << " " << f << endl;
+        root_cnt[y0 * scr_size + x0]--;
+        if (f) {
+          if (root_cnt[y0 * scr_size + x0] == 0 &&
+              image[(y0 * scr_size + x0) * 3 + 0] == 255 &&
+              image[(y0 * scr_size + x0) * 3 + 1] == 0 &&
+              image[(y0 * scr_size + x0) * 3 + 2] == 0) {
+            image[(y0 * scr_size + x0) * 3 + 0] = 255;
+            image[(y0 * scr_size + x0) * 3 + 1] = 255;
+            image[(y0 * scr_size + x0) * 3 + 2] = 255;
+          }
+        } else {
+          varible llx, hhx, lly, hhy;
+          llx.r.push_back(range());
+          hhx.r.push_back(range());
+          lly.r.push_back(range());
+          hhy.r.push_back(range());
+          llx.r[0].lo = llx.r[0].hi = u.first.lo;
+          hhx.r[0].lo = hhx.r[0].hi = u.first.hi;
+          lly.r[0].lo = lly.r[0].hi = u.second.lo;
+          hhy.r[0].lo = hhy.r[0].hi = u.second.hi;
+          varible ll = func(llx, lly), hh = func(hhx, hhy);
+          varible lh = func(llx, hhy), hl = func(hhx, lly);
+          vector<reference_wrapper<const varible>> tt;
+          if (ll.r.size() == 1) {
+            tt.push_back(ref(ll));
+          }
+          if (lh.r.size() == 1) {
+            tt.push_back(ref(lh));
+          }
+          if (hl.r.size() == 1) {
+            tt.push_back(ref(hl));
+          }
+          if (hh.r.size() == 1) {
+            tt.push_back(ref(hh));
+          }
+          bool t = false;
+          for (int i = 1; i < tt.size(); ++i) {
+            for (int j = 0; j < i; ++j) {
+              if (arf_sgn(tt[i].get().r[0].hi.val) *
+                  arf_sgn(tt[j].get().r[0].hi.val)) {
+                t = true;
+                break;
+              }
+            }
+            if (t)
+              break;
+          }
+          if (val.cont == make_pair(true, true) && t) {
+            image[(y0 * scr_size + x0) * 3 + 0] = 0;
+            image[(y0 * scr_size + x0) * 3 + 1] = 0;
+            image[(y0 * scr_size + x0) * 3 + 2] = 0;
+            root_cnt[y0 * scr_size + x0] = -1;
+          } else {
+            root_cnt[y0 * scr_size + x0] += 4;
+            fval xm, ym;
+            arf_add(xm.val, u.first.lo.val, u.first.hi.val, 128, ARF_RND_NEAR);
+            arf_div_ui(xm.val, xm.val, 2, 128, ARF_RND_NEAR);
+            arf_add(ym.val, u.second.lo.val, u.second.hi.val, 128,
+                    ARF_RND_NEAR);
+            arf_div_ui(ym.val, ym.val, 2, 128, ARF_RND_NEAR);
+            for (int i = 0; i < 4; ++i) {
+              U1.push_back(pair<range, range>());
+              if (i / 2) {
+                arf_set(U1.back().first.lo.val, u.first.lo.val);
+                arf_set(U1.back().first.hi.val, xm.val);
+              } else {
+                arf_set(U1.back().first.lo.val, xm.val);
+                arf_set(U1.back().first.hi.val, u.first.hi.val);
+              }
+              if (i % 2) {
+                arf_set(U1.back().second.lo.val, u.second.lo.val);
+                arf_set(U1.back().second.hi.val, ym.val);
+              } else {
+                arf_set(U1.back().second.lo.val, ym.val);
+                arf_set(U1.back().second.hi.val, u.second.hi.val);
+              }
+            }
+          }
+        }
+      }
+      k--;
+    }
+    cout << "subpx done" << endl;
   });
   while (!glfwWindowShouldClose(window)) {
     glBindTexture(GL_TEXTURE_2D, texture);

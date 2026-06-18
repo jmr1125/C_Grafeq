@@ -108,17 +108,77 @@ int main() {
   // arb_clear(x);
   // arb_clear(y);
 
-  arf_set_d(a.val, -1);
-  arf_set_d(b.val, 2.0);
-  arb_t aa, bb;
-  arb_init(aa);
-  arb_init(bb);
-  arb_set_arf(aa, a.val);
-  arb_set_arf(bb, b.val);
-  // arb_one(bb);
-  // arb_div_si(bb, bb, 3, 128);
-  arb_pow(aa, aa, bb, 128);
-  arb_print(aa);
-  arb_clear(aa);
-  arb_clear(bb);
+  // arf_set_d(a.val, -1);
+  // arf_set_d(b.val, 2.0);
+  // arb_t aa, bb;
+  // arb_init(aa);
+  // arb_init(bb);
+  // arb_set_arf(aa, a.val);
+  // arb_set_arf(bb, b.val);
+  // // arb_one(bb);
+  // // arb_div_si(bb, bb, 3, 128);
+  // arb_pow(aa, aa, bb, 128);
+  // arb_print(aa);
+  // arb_clear(aa);
+  // arb_clear(bb);
+
+  // varible x;
+  // x.r.push_back(range());
+  // arf_set_d(x.r[0].lo.val, -1);
+  // arf_set_d(x.r[0].hi.val, -0);
+  // cout << pow(x, x);
+  varible val, val1, val2;
+  auto f = [&](double xl, double xr, double yl, double yr) {
+    varible x, y;
+    x.r.push_back(range());
+    y.r.push_back(range());
+    arf_set_d(x.r[0].lo.val, xl);
+    arf_set_d(x.r[0].hi.val, xr);
+    arf_set_d(y.r[0].lo.val, yl);
+    arf_set_d(y.r[0].hi.val, yr);
+    cout << (val = add(mul(x, y), x)) << endl;
+  };
+  const double xl = -3.0 / 1024, xr = -1.0 / 512, yl = -3.0 / 1024,
+               yr = -1.0 / 512;
+  const double lx = (xr - xl) / 2, ly = (yr - yl) / 2;
+  f(xl, xr, yl, yr);
+  val1 = val;
+  cout << "===" << endl;
+  f(xl, xl + lx, yl, yl + ly);
+  val2 = Union(val2, val);
+  f(xl, xl + lx, yl + ly, yr);
+  val2 = Union(val2, val);
+  f(xl + lx, xr, yl, yl + ly);
+  val2 = Union(val2, val);
+  f(xl + lx, xr, yl + ly, yr);
+  val2 = Union(val2, val);
+  cout << val2 << endl;
+  bool same = false;
+  if (val1.r.size() == val2.r.size()) {
+    same = true;
+    for (int i = 0; i < val1.r.size(); ++i) {
+      arf_print(val1.r[i].lo.val);
+      if (arf_cmp(val1.r[i].lo.val, val2.r[i].lo.val) != 0) {
+        printf("!=");
+      } else {
+        printf("==");
+      }
+      arf_print(val2.r[i].lo.val);
+      printf("    ");
+      arf_print(val1.r[i].hi.val);
+      if (arf_cmp(val1.r[i].hi.val, val2.r[i].hi.val) != 0) {
+        printf("!=");
+      } else {
+        printf("==");
+      }
+      arf_print(val2.r[i].hi.val);
+      printf("\n");
+      if (arf_cmp(val1.r[i].lo.val, val2.r[i].lo.val) != 0 ||
+          arf_cmp(val1.r[i].hi.val, val2.r[i].hi.val) != 0) {
+        same = false;
+        break;
+      }
+    }
+  }
+  cout << same << endl;
 }

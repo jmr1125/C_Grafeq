@@ -2,7 +2,9 @@
 #include <flint/flint.h>
 #include <memory>
 #include <ostream>
+#include <utility>
 #include <vector>
+using std::pair;
 using std::shared_ptr;
 using std::vector;
 struct fval {
@@ -25,7 +27,10 @@ struct range {
   fval hi, lo;
 };
 struct varible {
+  varible();
+  varible(range);
   std::vector<range> r;
+  pair<bool, bool> cont;
 };
 bool isintersect(const range &, const range &);
 range add(const range &, const range &);

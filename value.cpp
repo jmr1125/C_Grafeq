@@ -1,12 +1,19 @@
 #include "value.hpp"
 #include "flint/arb.h"
 #include "flint/arf.h"
+#include <cmath>
 #include <functional>
+#include <iostream>
 #include <utility>
 fval::fval() { arf_init(val); }
 fval::fval(double x) { arf_set_d(val, x); }
 fval::fval(const arf_t &x) { arf_set(val, x); }
 fval::~fval() { arf_clear(val); }
+varible::varible() { cont = {true, true}; }
+varible::varible(range x) {
+  cont = {true, true};
+  r.push_back(x);
+}
 void fval::set_pinf() { arf_pos_inf(val); }
 void fval::set_ninf() { arf_neg_inf(val); }
 void fval::set_nan() { arf_nan(val); }
@@ -39,12 +46,14 @@ varible reciprocal(const range &x) {
     t.hi.set_pinf();
     arf_si_div(t.lo.val, 1, x.hi.val, 128, ARF_RND_FLOOR);
     res.r.push_back(std::move(t));
+    res.cont = {false, true};
     return res;
   } else if (sgn_h == 0) {
     range t;
     t.lo.set_ninf();
     arf_si_div(t.hi.val, 1, x.lo.val, 128, ARF_RND_CEIL);
     res.r.push_back(std::move(t));
+    res.cont = {false, true};
     return res;
   } else if (sgn_l < 0 && sgn_h > 0) {
     range t1, t2;
@@ -53,6 +62,7 @@ varible reciprocal(const range &x) {
         arf_si_div(t2.lo.val, 1, x.hi.val, 128, ARF_RND_FLOOR);
     res.r.push_back(std::move(t1));
     res.r.push_back(std::move(t2));
+    res.cont = {false, true};
     return res;
   }
   arb_t X, one;
@@ -65,6 +75,7 @@ varible reciprocal(const range &x) {
   arb_get_interval_arf(res.r[0].lo.val, res.r[0].hi.val, X, 128);
   arb_clear(X);
   arb_clear(one);
+  res.cont = {true, true};
   return res;
 }
 range mul(const range &x, const range &y) {
@@ -80,6 +91,12 @@ range mul(const range &x, const range &y) {
         swap(p2.first, p2.second);
       arf_mul(p[i][j].val, p1.first.get().val, p2.first.get().val, 128,
               i ? ARF_RND_CEIL : ARF_RND_FLOOR);
+      // arf_printd(p1.first.get().val, 10);
+      // printf(" * ");
+      // arf_printd(p2.first.get().val, 10);
+      // printf(" = ");
+      // arf_printd(p[i][j].val, 10);
+      // printf("\n");
       if (p[i][j].nan()) {
         if (arf_sgn(p1.second.get().val) == arf_sgn(p2.second.get().val)) {
           arf_pos_inf(p[i][j].val);
@@ -221,8 +238,11 @@ range exp(const range &x) {
   return res;
 }
 varible log(const range &x) {
-  if (arf_sgn(x.hi.val) <= 0)
-    return varible();
+  if (arf_sgn(x.hi.val) <= 0) {
+    varible res;
+    res.cont = {false, false};
+    return res;
+  }
   if (arf_sgn(x.lo.val) <= 0) {
     arb_t X;
     range r;
@@ -234,6 +254,7 @@ varible log(const range &x) {
     arb_clear(X);
     varible res;
     res.r.push_back(std::move(r));
+    res.cont = {true, true};
     return res;
   }
   varible res;
@@ -242,14 +263,16 @@ varible log(const range &x) {
   arb_init(X);
   arb_set_interval_arf(X, x.lo.val, x.hi.val, 128);
   arb_log(X, X, 128);
-  arb_print(X);
+  // arb_print(X);
   fval l, h;
   arb_get_interval_arf(res.r[0].lo.val, res.r[0].hi.val, X, 128);
   arb_clear(X);
+  res.cont = {true, true};
   return res;
 }
 bool isintersect(const range &a, const range &b) {
-  return arf_cmp(a.lo.val, b.hi.val) <= 0 && arf_cmp(a.hi.val, b.lo.val) >= 0;
+  return (arf_cmp(a.lo.val, b.hi.val) <= 0) &&
+         (arf_cmp(a.hi.val, b.lo.val) >= 0);
 }
 void sort(varible &x) {
   sort(x.r.begin(), x.r.end(),
@@ -258,11 +281,13 @@ void sort(varible &x) {
 void normalize(varible &x) {
   sort(x);
   varible res;
+  // std::cout << "x: " << x << std::endl;
   for (const auto &r : x.r) {
     if (res.r.empty()) {
       res.r.push_back(r);
     } else {
       auto &last = res.r.back();
+      // std::cout << last << ',' << r << std::endl;
       if (isintersect(last, r)) {
         arf_min(last.lo.val, last.lo.val, r.lo.val);
         arf_max(last.hi.val, last.hi.val, r.hi.val);
@@ -273,15 +298,20 @@ void normalize(varible &x) {
   }
   std::swap(x, res);
 }
+decltype(varible::cont) AND(decltype(varible::cont) a,
+                            decltype(varible::cont) b) {
+  return {a.first && b.first, a.second && b.second};
+}
 varible Union(const varible &a, const varible &b) {
   varible res;
   for (const auto &r : a.r) {
     res.r.push_back(r);
   }
-  for (const auto &r : a.r) {
+  for (const auto &r : b.r) {
     res.r.push_back(r);
   }
   normalize(res);
+  res.cont = AND(a.cont, b.cont);
   return res;
 }
 range ppow(const fval &a, const fval &b) {
@@ -296,17 +326,19 @@ range ppow(const fval &a, const fval &b) {
   return {.lo = l, .hi = r};
 }
 
-#include <iostream>
 varible pow(const range &a, const range &b) {
   if (arf_cmp(b.hi.val, b.lo.val) == 0) {
     if (arf_sgn(a.hi.val) <= 0) {
-      return varible();
+      varible res;
+      res.cont = {false, false};
+      return res;
     }
     if (arf_sgn(a.lo.val) <= 0) {
       const auto h = ppow(a.hi, b.lo);
       varible res;
       res.r.push_back(range());
       arf_set(res.r[0].hi.val, h.hi.val);
+      res.cont = {false, true};
       return res;
     }
     varible res;
@@ -315,24 +347,33 @@ varible pow(const range &a, const range &b) {
     res.r.push_back(range());
     arf_set(res.r[0].hi.val, h.hi.val);
     arf_set(res.r[0].lo.val, l.lo.val);
+    res.cont = {true, true};
     return res;
   } else {
-    varible A = {{a}}, B = {{b}};
-    std::cout << A << ' ' << B << std::endl;
+    // std::cout << A << ' ' << B << std::endl;
     if (arf_sgn(a.hi.val) <= 0 && arf_sgn(a.lo.val) < 0) {
-      auto t = pow(neg(a), b), t1 = neg(t);
-      return Union(t, t1);
+      auto t = pow(neg(a), b);
+      auto t1 = neg(t);
+      // std::cout << "t,t1: " << t << ' ' << t1 << std::endl;
+      // std::cout << "--- " << t << std::endl;
+      auto res = Union(t, t1);
+      res.cont = {true, true};
+      return res;
     }
     if (arf_sgn(a.lo.val) < 0) {
       range x1, x2;
       arf_set(x1.lo.val, a.lo.val);
       arf_set(x2.hi.val, a.hi.val);
-      return Union(pow(x1, b), pow(x2, b));
+      varible res = Union(pow(x1, b), pow(x2, b));
+      res.cont = {false, true};
+      return res;
     }
     // std::cout << "--- " << A << ',' << B << std::endl;
     // std::cout << "--- " << log(A) << std::endl;
     // std::cout << "--- " << mul(B, log(A)) << std::endl;
-    return exp(mul(B, log(A)));
+    varible res = exp(mul(varible(a), log(varible(b))));
+    res.cont = {true, true};
+    return res;
   }
 }
 
@@ -342,6 +383,7 @@ varible add(varible a, varible b) {
     for (const auto &x2 : b.r)
       res.r.push_back(add(x1, x2));
   normalize(res);
+  res.cont = AND(a.cont, b.cont);
   return res;
 }
 varible neg(varible a) {
@@ -349,6 +391,7 @@ varible neg(varible a) {
   for (const auto &x1 : a.r)
     res.r.push_back(neg(x1));
   normalize(res);
+  res.cont = a.cont;
   return res;
 }
 varible mul(varible a, varible b) {
@@ -357,14 +400,15 @@ varible mul(varible a, varible b) {
     for (const auto &x2 : b.r)
       res.r.push_back(mul(x1, x2));
   normalize(res);
+  res.cont = AND(a.cont, b.cont);
   return res;
 }
 varible reciprocal(varible a) {
   varible res;
   for (const auto &x : a.r)
-    for (const auto &x1 : reciprocal(x).r)
-      res.r.push_back(x1);
+    res = Union(res, reciprocal(x));
   normalize(res);
+  res.cont = AND(res.cont, a.cont);
   return res;
 }
 varible sin(varible a) {
@@ -372,6 +416,7 @@ varible sin(varible a) {
   for (const auto &x1 : a.r)
     res.r.push_back(sin(x1));
   normalize(res);
+  res.cont = a.cont;
   return res;
 }
 varible cos(varible a) {
@@ -379,15 +424,15 @@ varible cos(varible a) {
   for (const auto &x1 : a.r)
     res.r.push_back(cos(x1));
   normalize(res);
+  res.cont = a.cont;
   return res;
 }
 varible tan(varible a) { return mul(sin(a), reciprocal(cos(a))); }
 varible log(varible a) {
   varible res;
-  for (const auto &x : a.r)
-    for (const auto &x1 : log(x).r)
-      res.r.push_back(x1);
-  normalize(res);
+  for (const auto &x : a.r) {
+    res = Union(res, log(x));
+  }
   return res;
 }
 varible exp(varible a) {
@@ -395,15 +440,17 @@ varible exp(varible a) {
   for (const auto &x1 : a.r)
     res.r.push_back(exp(x1));
   normalize(res);
+  res.cont = a.cont;
   return res;
 }
 varible pow(varible a, varible b) {
   varible res;
   for (const auto &x1 : a.r)
     for (const auto &x2 : b.r)
-      for (const auto r : pow(x1, x2).r)
-        res.r.push_back(r);
+      res = Union(res, pow(x1, x2));
   normalize(res);
+  res.cont = AND(res.cont, a.cont);
+  res.cont = AND(res.cont, b.cont);
   return res;
 }
 
