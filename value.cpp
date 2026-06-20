@@ -6,8 +6,14 @@
 #include <iostream>
 #include <utility>
 fval::fval() { arf_init(val); }
-fval::fval(double x) { arf_set_d(val, x); }
-fval::fval(const arf_t &x) { arf_set(val, x); }
+fval::fval(double x) {
+  arf_init(val);
+  arf_set_d(val, x);
+}
+fval::fval(const arf_t &x) {
+  arf_init(val);
+  arf_set(val, x);
+}
 fval::~fval() { arf_clear(val); }
 varible::varible() { cont = {true, true}; }
 varible::varible(range x) {
@@ -377,6 +383,80 @@ varible pow(const range &a, const range &b) {
   }
 }
 
+varible floor(const range &x) {
+  fval loi, hii;
+  arf_floor(loi.val, x.lo.val);
+  arf_floor(hii.val, x.hi.val);
+  fval d;
+  arf_sub(d.val, hii.val, loi.val, 128, ARF_RND_NEAR);
+  if (arf_equal_si(d.val, 0)) {
+    varible res;
+    res.cont = {true, true};
+    res.r.push_back({.lo = loi, .hi = hii});
+    return res;
+  } else if (arf_equal_si(d.val, 1)) {
+    varible res;
+    res.cont = {false, true};
+    res.r.push_back({.lo = loi, .hi = loi});
+    res.r.push_back({.lo = hii, .hi = hii});
+    return res;
+  } else {
+    varible res;
+    res.cont = {false, true};
+    res.r.push_back({.lo = loi, .hi = hii});
+    return res;
+  }
+}
+
+varible ceil(const range &x) {
+  fval loi, hii;
+  arf_ceil(loi.val, x.lo.val);
+  arf_ceil(hii.val, x.hi.val);
+  fval d;
+  arf_sub(d.val, hii.val, loi.val, 128, ARF_RND_NEAR);
+  if (arf_equal_si(d.val, 0)) {
+    varible res;
+    res.cont = {true, true};
+    res.r.push_back({.lo = loi, .hi = hii});
+    return res;
+  } else if (arf_equal_si(d.val, 1)) {
+    varible res;
+    res.cont = {false, true};
+    res.r.push_back({.lo = loi, .hi = loi});
+    res.r.push_back({.lo = hii, .hi = hii});
+    return res;
+  } else {
+    varible res;
+    res.cont = {false, true};
+    res.r.push_back({.lo = loi, .hi = hii});
+    return res;
+  }
+}
+
+varible sqrt(const range &x) {
+  if (arf_sgn(x.hi.val) < 0) {
+    varible res;
+    res.cont = {false, false};
+    return res;
+  }
+  fval hh;
+  arf_sqrt(hh.val, x.hi.val, 128, ARF_RND_CEIL);
+  if (arf_sgn(x.lo.val) < 0) {
+    varible res;
+    res.cont = {false, true};
+    res.r.push_back({});
+    res.r.back().lo = 0;
+    res.r.back().hi = hh;
+    return res;
+  }
+  fval ll;
+  arf_sqrt(ll.val, x.lo.val, 128, ARF_RND_FLOOR);
+  varible res;
+  res.cont = {true, true};
+  res.r.push_back({.lo = ll, .hi = hh});
+  return res;
+}
+
 varible add(varible a, varible b) {
   varible res;
   for (const auto &x1 : a.r)
@@ -405,8 +485,13 @@ varible mul(varible a, varible b) {
 }
 varible reciprocal(varible a) {
   varible res;
-  for (const auto &x : a.r)
-    res = Union(res, reciprocal(x));
+  for (const auto &x : a.r) {
+    const auto &rr = reciprocal(x);
+    res.cont = AND(res.cont, rr.cont);
+    for (const auto &r : rr.r) {
+      res.r.push_back(r);
+    }
+  }
   normalize(res);
   res.cont = AND(res.cont, a.cont);
   return res;
@@ -431,8 +516,14 @@ varible tan(varible a) { return mul(sin(a), reciprocal(cos(a))); }
 varible log(varible a) {
   varible res;
   for (const auto &x : a.r) {
-    res = Union(res, log(x));
+    const auto &rr = log(x);
+    res.cont = AND(res.cont, rr.cont);
+    for (const auto &r : rr.r) {
+      res.r.push_back(r);
+    }
   }
+  normalize(res);
+  res.cont = AND(res.cont, a.cont);
   return res;
 }
 varible exp(varible a) {
@@ -446,11 +537,55 @@ varible exp(varible a) {
 varible pow(varible a, varible b) {
   varible res;
   for (const auto &x1 : a.r)
-    for (const auto &x2 : b.r)
-      res = Union(res, pow(x1, x2));
+    for (const auto &x2 : b.r) {
+      const auto &r = pow(x1, x2);
+      res.cont = AND(res.cont, r.cont);
+      for (const auto &u : r.r) {
+        res.r.push_back(u);
+      }
+    }
   normalize(res);
   res.cont = AND(res.cont, a.cont);
   res.cont = AND(res.cont, b.cont);
+  return res;
+}
+varible floor(varible a) {
+  varible res;
+  for (const auto &x : a.r) {
+    const auto &rr = floor(x);
+    res.cont = AND(res.cont, rr.cont);
+    for (const auto &r : rr.r) {
+      res.r.push_back(r);
+    }
+  }
+  normalize(res);
+  res.cont = AND(res.cont, a.cont);
+  return res;
+}
+varible ceil(varible a) {
+  varible res;
+  for (const auto &x : a.r) {
+    const auto &rr = ceil(x);
+    res.cont = AND(res.cont, rr.cont);
+    for (const auto &r : rr.r) {
+      res.r.push_back(r);
+    }
+  }
+  normalize(res);
+  res.cont = AND(res.cont, a.cont);
+  return res;
+}
+varible sqrt(varible a) {
+  varible res;
+  for (const auto &x : a.r) {
+    const auto &rr = sqrt(x);
+    res.cont = AND(res.cont, rr.cont);
+    for (const auto &r : rr.r) {
+      res.r.push_back(r);
+    }
+  }
+  normalize(res);
+  res.cont = AND(res.cont, a.cont);
   return res;
 }
 

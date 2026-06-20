@@ -46,6 +46,10 @@ varible log(const range &);
 range exp(const range &);
 varible pow(const range &, const range &);
 
+varible floor(const range&);
+varible ceil(const range&);
+varible sqrt(const range&);
+
 varible Union(const varible &, const varible &);
 varible add(varible, varible);
 varible neg(varible);
@@ -57,6 +61,9 @@ varible tan(varible);
 varible log(varible);
 varible exp(varible);
 varible pow(varible, varible);
+varible floor(varible);
+varible ceil(varible);
+varible sqrt(varible);
 
 std::ostream &operator<<(std::ostream &, const range &);
 std::ostream &operator<<(std::ostream &, const varible &);

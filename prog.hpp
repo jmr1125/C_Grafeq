@@ -9,12 +9,15 @@ struct inst {
     mul,
     div,
     pow,
-    uon,
+    uon, // 2
     sin,
     cos,
     tan,
     exp,
     log,
+    flr,
+    cil,
+    qrt,
     ret // 1
   };
   opcode op;

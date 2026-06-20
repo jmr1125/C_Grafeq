@@ -118,7 +118,7 @@ void prog::load(std::istream &ist) {
 //            cons                mem
 //[ x ][ y ][              ][            ]
 //             const_size       mem_size
-// 0 ...    c_s-1  c_s  c_s+1 c_s+2
+//  0    1   2 ...    c_s+1   c_s+2
 //
 // mem_size  const_size  prog_size
 // const_v
