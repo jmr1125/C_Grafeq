@@ -130,17 +130,17 @@ C_GrafEQ/fast:
 .PHONY : C_GrafEQ/fast
 
 #=============================================================================
-# Target rules for targets named genExpr
+# Target rules for targets named easm
 
 # Build rule for target.
-genExpr: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 genExpr
-.PHONY : genExpr
+easm: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 easm
+.PHONY : easm
 
 # fast build rule for target.
-genExpr/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/genExpr.dir/build.make CMakeFiles/genExpr.dir/build
-.PHONY : genExpr/fast
+easm/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/easm.dir/build.make CMakeFiles/easm.dir/build
+.PHONY : easm/fast
 
 #=============================================================================
 # Target rules for targets named test1
@@ -168,29 +168,29 @@ test2/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/test2.dir/build.make CMakeFiles/test2.dir/build
 .PHONY : test2/fast
 
-genexpr.o: genexpr.cpp.o
-.PHONY : genexpr.o
+compiler.o: compiler.cpp.o
+.PHONY : compiler.o
 
 # target to build an object file
-genexpr.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/genExpr.dir/build.make CMakeFiles/genExpr.dir/genexpr.cpp.o
-.PHONY : genexpr.cpp.o
+compiler.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/easm.dir/build.make CMakeFiles/easm.dir/compiler.cpp.o
+.PHONY : compiler.cpp.o
 
-genexpr.i: genexpr.cpp.i
-.PHONY : genexpr.i
+compiler.i: compiler.cpp.i
+.PHONY : compiler.i
 
 # target to preprocess a source file
-genexpr.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/genExpr.dir/build.make CMakeFiles/genExpr.dir/genexpr.cpp.i
-.PHONY : genexpr.cpp.i
+compiler.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/easm.dir/build.make CMakeFiles/easm.dir/compiler.cpp.i
+.PHONY : compiler.cpp.i
 
-genexpr.s: genexpr.cpp.s
-.PHONY : genexpr.s
+compiler.s: compiler.cpp.s
+.PHONY : compiler.s
 
 # target to generate assembly for a file
-genexpr.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/genExpr.dir/build.make CMakeFiles/genExpr.dir/genexpr.cpp.s
-.PHONY : genexpr.cpp.s
+compiler.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/easm.dir/build.make CMakeFiles/easm.dir/compiler.cpp.s
+.PHONY : compiler.cpp.s
 
 main.o: main.cpp.o
 .PHONY : main.o
@@ -239,6 +239,33 @@ prog.s: prog.cpp.s
 prog.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/C_GrafEQ.dir/build.make CMakeFiles/C_GrafEQ.dir/prog.cpp.s
 .PHONY : prog.cpp.s
+
+prog1.o: prog1.cpp.o
+.PHONY : prog1.o
+
+# target to build an object file
+prog1.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/C_GrafEQ.dir/build.make CMakeFiles/C_GrafEQ.dir/prog1.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/easm.dir/build.make CMakeFiles/easm.dir/prog1.cpp.o
+.PHONY : prog1.cpp.o
+
+prog1.i: prog1.cpp.i
+.PHONY : prog1.i
+
+# target to preprocess a source file
+prog1.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/C_GrafEQ.dir/build.make CMakeFiles/C_GrafEQ.dir/prog1.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/easm.dir/build.make CMakeFiles/easm.dir/prog1.cpp.i
+.PHONY : prog1.cpp.i
+
+prog1.s: prog1.cpp.s
+.PHONY : prog1.s
+
+# target to generate assembly for a file
+prog1.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/C_GrafEQ.dir/build.make CMakeFiles/C_GrafEQ.dir/prog1.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/easm.dir/build.make CMakeFiles/easm.dir/prog1.cpp.s
+.PHONY : prog1.cpp.s
 
 test1.o: test1.cpp.o
 .PHONY : test1.o
@@ -327,18 +354,21 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... C_GrafEQ"
-	@echo "... genExpr"
+	@echo "... easm"
 	@echo "... test1"
 	@echo "... test2"
-	@echo "... genexpr.o"
-	@echo "... genexpr.i"
-	@echo "... genexpr.s"
+	@echo "... compiler.o"
+	@echo "... compiler.i"
+	@echo "... compiler.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
 	@echo "... prog.o"
 	@echo "... prog.i"
 	@echo "... prog.s"
+	@echo "... prog1.o"
+	@echo "... prog1.i"
+	@echo "... prog1.s"
 	@echo "... test1.o"
 	@echo "... test1.i"
 	@echo "... test1.s"

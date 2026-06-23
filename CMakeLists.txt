@@ -29,7 +29,7 @@ include_directories(${GLEW_INCLUDE_DIRS})
 #  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
 #  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 
-#include_directories(${OpenCL_INCLUDE_DIRS})
+#include_directories(${opencl_INCLUDE_DIRS})
 #  link_libraries(${OpenCL_LIBRARY})
 
 find_package(PkgConfig REQUIRED)
@@ -37,14 +37,16 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(FLINT REQUIRED flint)
 
 
-add_executable(${PROJECT_NAME} main.cpp value.cpp prog.cpp)
+add_executable(${PROJECT_NAME} main.cpp value.cpp prog.cpp prog1.cpp)
 target_link_directories(${PROJECT_NAME} PRIVATE ${FLINT_LIBRARY_DIRS})
 target_link_libraries(${PROJECT_NAME} glfw OpenGL::GL GLEW::GLEW ${FLINT_LIBRARIES})
 
 include_directories( ${FLINT_INCLUDE_DIRS})
 
+add_executable(easm compiler.cpp prog1.cpp)
+
 #add_executable(testeval testeval.cpp eval.cpp)
-add_executable(genExpr genexpr.cpp)
+#add_executable(genExpr genexpr.cpp)
 #target_link_libraries(${PROJECT_NAME} OpenMP::OpenMP_CXX)
 
 add_executable(test1 test1.cpp value.cpp)

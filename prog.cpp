@@ -5,7 +5,6 @@
 #include <functional>
 #include <iostream>
 #include <istream>
-#include <map>
 #include <stdexcept>
 varible prog::eval(varible x, varible y) const {
   vector<varible> mem(mem_size);
@@ -33,6 +32,9 @@ varible prog::eval(varible x, varible y) const {
     case inst::sub:
       mem[inst.d - cons.size() - 2] = add(ld(inst.s1), neg(ld(inst.s2)));
       // print();
+      break;
+    case inst::neg:
+      mem[inst.d - cons.size() - 2] = neg(ld(inst.s1));
       break;
     case inst::mul:
       mem[inst.d - cons.size() - 2] = mul(ld(inst.s1), ld(inst.s2));
@@ -89,16 +91,9 @@ varible prog::eval(varible x, varible y) const {
   }
   throw std::runtime_error("no ret");
 }
-const std::map<std::string, inst::opcode> mp{
-    {"add", inst::add}, {"sub", inst::sub}, {"mul", inst::mul},
-    {"div", inst::div}, {"pow", inst::pow}, {"uon", inst::uon},
-    {"sin", inst::sin}, {"cos", inst::cos}, {"tan", inst::tan},
-    {"exp", inst::exp}, {"log", inst::log}, {"flr", inst::flr},
-    {"cil", inst::cil}, {"qrt", inst::qrt}, {"ret", inst::ret}};
 void prog::load(std::istream &ist) {
-  int mem_size, const_size, prog_size;
-  ist >> mem_size >> const_size >> prog_size;
-  this->mem_size = mem_size;
+  int const_size, prog_size;
+  ist >> const_size >> prog_size;
   for (int i = 0; i < const_size; ++i) {
     double c;
     ist >> c;
@@ -112,7 +107,8 @@ void prog::load(std::istream &ist) {
     std::string op;
     uint16_t d, s1, s2;
     ist >> op >> d >> s1 >> s2;
-    prog.push_back({.op = mp.at(op), .d = d, .s1 = s1, .s2 = s2});
+    mem_size = std::max(mem_size, d);
+    prog.push_back({.op = str2op.at(op), .d = d, .s1 = s1, .s2 = s2});
   }
 }
 //            cons                mem
