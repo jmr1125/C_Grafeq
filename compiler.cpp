@@ -69,7 +69,7 @@ struct expr_tree {
       return false;
     switch (op) {
     case inst::ret:
-      return hash;
+      return hash == rsh.hash;
     case inst::sub:
     case inst::div:
     case inst::pow:
@@ -97,7 +97,7 @@ struct expr_tree {
               << std::hex << hash << std::dec << std::endl;
     switch (op) {
     case inst::ret:
-      std::cerr << std::string(c * 2, ' ') << hash << std::endl;
+      // std::cerr << std::string(c * 2, ' ') << hash << std::endl;
       break;
     case inst::sub:
     case inst::div:
@@ -203,9 +203,6 @@ int main() {
       [inst::log] = 300, [inst::flr] = 300, [inst::cil] = 300,
       [inst::qrt] = 300};
   // cout << "consts: " << endl;
-  for (const auto &x : constants)
-    cout << x << ' ';
-  cout << endl;
   std::stack<shared_ptr<expr_tree>> num;
   std::stack<inst::opcode> op; // ret ==> (
   bool begin = true;
@@ -292,6 +289,7 @@ int main() {
           }
           op.pop();
         } else if (t == ",") {
+          begin = true;
           continue;
         } else {
           string ss;
@@ -312,8 +310,7 @@ int main() {
             ss = "cil";
           else if (t == "sqrt")
             ss = "qrt";
-          exit_if_empty(num);
-          while (prio[op.top()] > prio[str2op.at(ss)]) {
+          while (prio[op.top()] >= prio[str2op.at(ss)]) {
             pop_one(op, num);
           }
           op.push(str2op.at(ss));
@@ -407,20 +404,29 @@ int main() {
     }
     return -1;
   };
+  auto insert = [&map](const shared_ptr<expr_tree> &x, int i) {
+    map[x->hash].push_back({x, i});
+  };
   topo.erase(remove_if(topo.begin(), topo.end(),
                        [](const auto &x) { return x->op == inst::ret; }),
              topo.end());
-  cout << constants.size() << ' ' << topo.size() << endl;
+  cout << constants.size() << endl;
+  for (const auto &x : constants)
+    cout << x << ' ';
+  cout << endl;
   for (const auto &t : topo) {
     // cerr << t << endl;
-    if (t->op == inst::ret)
+    if (t->op == inst::ret) {
+      insert(t, t->hash);
       continue;
+    }
     const auto i = find(t);
     if (i == -1) {
       // cerr << t << ' ' << expr_tree::str[t->op] << ' ' << t->hash << ' ' <<
       // t->l
       //      << ' ' << t->r << endl;
       cout << expr_tree::str[t->op] << ' ' << max_i << ' ';
+      insert(t, max_i);
       switch (t->op) {
       case inst::add:
       case inst::sub:

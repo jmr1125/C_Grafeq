@@ -158,53 +158,108 @@ fval getpi() {
 //   fmpz_clear(kr);
 //   return res;
 // }
-
+struct aarb {
+  aarb() { arb_init(v); }
+  ~aarb() { arb_clear(v); }
+  arb_t v;
+};
 range sin(const range &x) {
-  // bool to_long = false;
-  // {
-  //   fval del;
-  //   arf_sub(del.val, x.hi.val, x.lo.val, 128, ARF_RND_CEIL);
-  //   arf_div_si(del.val, del.val, 2, 128, ARF_RND_CEIL);
-  //   to_long = arf_cmp(del.val, getpi().val) >= 0;
-  // }
-  if (x.hi.pinf() || x.lo.ninf() // || to_long
-  ) {
+  if (x.hi.pinf() || x.lo.ninf()) {
     range res;
     arf_one(res.hi.val);
     arf_neg(res.lo.val, res.hi.val);
     return std::move(res);
   }
-  arb_t X;
   range res;
-  arb_init(X);
-  arb_set_interval_arf(X, x.lo.val, x.hi.val, 128);
-  arb_sin(X, X, 128);
-  arb_get_interval_arf(res.lo.val, res.hi.val, X, 128);
-  arb_clear(X);
+  arf_one(res.lo.val);
+  arf_neg(res.hi.val, res.lo.val);
+  aarb sin_a, sin_b, pi_2, pi, _2pi, aa, bb, c_aa, f_bb;
+  arb_const_pi(pi.v, 128);
+  arb_mul_2exp_si(pi_2.v, pi.v, -1);
+  arb_mul_2exp_si(_2pi.v, pi.v, 1);
+  arb_set_arf(sin_a.v, x.lo.val);
+  arb_set_arf(sin_b.v, x.hi.val);
+  arb_sin(sin_a.v, sin_a.v, 128);
+  arb_sin(sin_b.v, sin_b.v, 128);
+
+  arb_set_arf(aa.v, x.lo.val);
+  arb_set_arf(bb.v, x.hi.val);
+  arb_sub(c_aa.v, aa.v, pi_2.v, 128);
+  arb_sub(f_bb.v, bb.v, pi_2.v, 128);
+  arb_div(c_aa.v, c_aa.v, _2pi.v, 128);
+  arb_div(f_bb.v, f_bb.v, _2pi.v, 128);
+  arb_ceil(c_aa.v, c_aa.v, 128);
+  arb_floor(f_bb.v, f_bb.v, 128);
+  if (arb_le(c_aa.v, f_bb.v)) {
+    arf_one(res.hi.val);
+  }
+  arb_add(c_aa.v, aa.v, pi_2.v, 128);
+  arb_add(f_bb.v, bb.v, pi_2.v, 128);
+  arb_div(c_aa.v, c_aa.v, _2pi.v, 128);
+  arb_div(f_bb.v, f_bb.v, _2pi.v, 128);
+  arb_ceil(c_aa.v, c_aa.v, 128);
+  arb_floor(f_bb.v, f_bb.v, 128);
+  if (arb_le(c_aa.v, f_bb.v)) {
+    arf_one(res.lo.val);
+    arf_neg(res.lo.val, res.lo.val);
+  }
+  fval hh, ll;
+  arb_get_ubound_arf(hh.val, sin_b.v, 128);
+  arb_get_lbound_arf(ll.val, sin_a.v, 128);
+  arf_max(res.hi.val, res.hi.val, hh.val);
+  arf_min(res.lo.val, res.lo.val, ll.val);
+  arb_get_ubound_arf(hh.val, sin_a.v, 128);
+  arb_get_lbound_arf(ll.val, sin_b.v, 128);
+  arf_max(res.hi.val, res.hi.val, hh.val);
+  arf_min(res.lo.val, res.lo.val, ll.val);
   return res;
 }
 range cos(const range &x) {
-  // bool to_long = false;
-  // {
-  //   fval del;
-  //   arf_sub(del.val, x.hi.val, x.lo.val, 128, ARF_RND_CEIL);
-  //   arf_div_si(del.val, del.val, 2, 128, ARF_RND_CEIL);
-  //   to_long = arf_cmp(del.val, getpi().val) >= 0;
-  // }
-  if (x.hi.pinf() || x.lo.ninf() // || to_long
-  ) {
+  if (x.hi.pinf() || x.lo.ninf()) {
     range res;
     arf_one(res.hi.val);
     arf_neg(res.lo.val, res.hi.val);
     return std::move(res);
   }
-  arb_t X;
   range res;
-  arb_init(X);
-  arb_set_interval_arf(X, x.lo.val, x.hi.val, 128);
-  arb_cos(X, X, 128);
-  arb_get_interval_arf(res.lo.val, res.hi.val, X, 128);
-  arb_clear(X);
+  arf_one(res.lo.val);
+  arf_neg(res.hi.val, res.lo.val);
+  aarb cos_a, cos_b, pi, _2pi, aa, bb, c_aa, f_bb;
+  arb_const_pi(_2pi.v, 128);
+  arb_const_pi(pi.v, 128);
+  arb_mul_2exp_si(_2pi.v, _2pi.v, 1);
+  arb_set_arf(cos_a.v, x.lo.val);
+  arb_set_arf(cos_b.v, x.hi.val);
+  arb_cos(cos_a.v, cos_a.v, 128);
+  arb_cos(cos_b.v, cos_b.v, 128);
+  arb_set_arf(aa.v, x.lo.val);
+  arb_set_arf(bb.v, x.hi.val);
+  arb_div(c_aa.v, aa.v, _2pi.v, 128);
+  arb_div(f_bb.v, bb.v, _2pi.v, 128);
+  arb_ceil(c_aa.v, c_aa.v, 128);
+  arb_floor(f_bb.v, f_bb.v, 128);
+  if (arb_le(c_aa.v, f_bb.v)) {
+    arf_one(res.hi.val);
+  }
+  arb_sub(c_aa.v, aa.v, pi.v, 128);
+  arb_sub(f_bb.v, bb.v, pi.v, 128);
+  arb_div(c_aa.v, c_aa.v, _2pi.v, 128);
+  arb_div(f_bb.v, f_bb.v, _2pi.v, 128);
+  arb_ceil(c_aa.v, c_aa.v, 128);
+  arb_floor(f_bb.v, f_bb.v, 128);
+  if (arb_le(c_aa.v, f_bb.v)) {
+    arf_one(res.lo.val);
+    arf_neg(res.lo.val, res.lo.val);
+  }
+  fval hh, ll;
+  arb_get_ubound_arf(hh.val, cos_b.v, 128);
+  arb_get_lbound_arf(ll.val, cos_a.v, 128);
+  arf_max(res.hi.val, res.hi.val, hh.val);
+  arf_min(res.lo.val, res.lo.val, ll.val);
+  arb_get_ubound_arf(hh.val, cos_a.v, 128);
+  arb_get_lbound_arf(ll.val, cos_b.v, 128);
+  arf_max(res.hi.val, res.hi.val, hh.val);
+  arf_min(res.lo.val, res.lo.val, ll.val);
   return res;
 }
 range exp(const range &x) {
@@ -287,6 +342,7 @@ void sort(varible &x) {
 void normalize(varible &x) {
   sort(x);
   varible res;
+  res.cont = x.cont;
   // std::cout << "x: " << x << std::endl;
   for (const auto &r : x.r) {
     if (res.r.empty()) {

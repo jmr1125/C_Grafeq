@@ -1,0 +1,1 @@
+cos(x*siny)-floor(cos(x*siny)/sin(x*cosy))*sin(x*cosy)-1/2*(sin(50*x)+sin(50*y))

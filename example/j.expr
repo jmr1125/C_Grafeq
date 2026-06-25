@@ -1,0 +1,1 @@
+sqrt(sin(x*x-y*y)*sin(x*x-y*y))-sin(x+y)-cos(x*y)

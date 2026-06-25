@@ -1,0 +1,1 @@
+sqrt(sin(x*x+2*x*y)*sin(x*x+2*x*y))-sin(x-2*y)

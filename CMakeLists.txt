@@ -44,6 +44,9 @@ target_link_libraries(${PROJECT_NAME} glfw OpenGL::GL GLEW::GLEW ${FLINT_LIBRARI
 include_directories( ${FLINT_INCLUDE_DIRS})
 
 add_executable(easm compiler.cpp prog1.cpp)
+add_executable(testeval testeval.cpp prog.cpp prog1.cpp value.cpp)
+target_link_directories(testeval PRIVATE ${FLINT_LIBRARY_DIRS})
+target_link_libraries(testeval PRIVATE ${FLINT_LIBRARIES})
 
 #add_executable(testeval testeval.cpp eval.cpp)
 #add_executable(genExpr genexpr.cpp)
