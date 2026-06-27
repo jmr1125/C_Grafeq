@@ -67,6 +67,30 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action,
   if (action == GLFW_PRESS && key == GLFW_KEY_ESCAPE)
     glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
+int f(pair<int, int> x) {
+  int res = 0;
+  // int base = 1 << 16;
+  // while (base) {
+  //   if (x.first & base) {
+  //     res |= 1;
+  //     res <<= 1;
+  //   }
+  //   if (x.second & base) {
+  //     res |= 1;
+  //     res <<= 1;
+  //   }
+  //   base >>= 1;
+  // }
+  for (int i = 0; i < 16; ++i) {
+    res <<= 1;
+    res |= x.first & 1;
+    res <<= 1;
+    res |= x.second & 1;
+    x.first >>= 1;
+    x.second >>= 1;
+  }
+  return res;
+}
 struct plotter {
   enum pxstate { yes, maybe, no };
   vector<pxstate> image;
@@ -74,7 +98,12 @@ struct plotter {
   string fname;
   int scr_size;
   double xmin, xmax, ymin, ymax;
-  vector<pair<range, range>> U, U1;
+  struct rect {
+    ~rect() {}
+    pair<range, range> x;
+    pair<int, int> ll, hh;
+  };
+  vector<rect> U, U1;
   int k;
   enum plotstate { px, subpx, done } state;
   decltype(U)::iterator iter;
@@ -91,11 +120,13 @@ struct plotter {
     arf_set_d(xh.val, xmax);
     arf_set_d(yl.val, ymin);
     arf_set_d(yh.val, ymax);
-    U1.push_back(pair<range, range>());
-    arf_set(U1[0].first.lo.val, xl.val);
-    arf_set(U1[0].first.hi.val, xh.val);
-    arf_set(U1[0].second.lo.val, yl.val);
-    arf_set(U1[0].second.hi.val, yh.val);
+    U1.push_back(rect());
+    arf_set(U1[0].x.first.lo.val, xl.val);
+    arf_set(U1[0].x.first.hi.val, xh.val);
+    arf_set(U1[0].x.second.lo.val, yl.val);
+    arf_set(U1[0].x.second.hi.val, yh.val);
+    U1[0].ll.first = U1[0].ll.second = 0;
+    U1[0].hh.first = U1[0].hh.second = scr_size;
     iter = U.begin();
     state = px;
     ifstream ifs(file);
@@ -110,11 +141,12 @@ struct plotter {
     if (state == px) {
       if (k < 0) {
         for (const auto &u : U1) {
-          const double xx0 = arf_get_d(u.first.lo.val, ARF_RND_FLOOR),
-                       yy0 = arf_get_d(u.second.lo.val, ARF_RND_FLOOR);
-          const int x0 = (xx0 - xmin) / (xmax - xmin) * scr_size;
-          const int y0 = (yy0 - ymin) / (ymax - ymin) * scr_size;
-          root_cnt[y0 * scr_size + x0]++;
+          // const double xx0 = arf_get_d(u.first.lo.val, ARF_RND_FLOOR),
+          //              yy0 = arf_get_d(u.second.lo.val, ARF_RND_FLOOR);
+          // const int x0 = (xx0 - xmin) / (xmax - xmin) * scr_size;
+          // const int y0 = (yy0 - ymin) / (ymax - ymin) * scr_size;
+          // root_cnt[y0 * scr_size + x0]++;
+          root_cnt[u.ll.second * scr_size + u.ll.first]++;
         }
         state = subpx;
         iter = U.begin();
@@ -127,6 +159,9 @@ struct plotter {
         }
         swap(U, U1);
         U1.clear();
+        // cout << U.size() << endl;
+        sort(U.begin(), U.begin() + U.size(),
+             [](const rect &a, const rect &b) { return f(a.ll) < f(b.ll); });
         iter = U.begin();
       }
       if (iter == U.end()) {
@@ -135,15 +170,15 @@ struct plotter {
         return;
       }
       const auto &u = *iter;
-      int xl = (arf_get_d(u.first.lo.val, ARF_RND_NEAR) - xmin) /
-               (xmax - xmin) * scr_size;
-      int xh = (arf_get_d(u.first.hi.val, ARF_RND_NEAR) - xmin) /
-               (xmax - xmin) * scr_size;
-      int yl = (arf_get_d(u.second.lo.val, ARF_RND_NEAR) - ymin) /
-               (ymax - ymin) * scr_size;
-      int yh = (arf_get_d(u.second.hi.val, ARF_RND_NEAR) - ymin) /
-               (ymax - ymin) * scr_size;
-      varible x(u.first), y(u.second);
+      // int xl = (arf_get_d(u.first.lo.val, ARF_RND_NEAR) - xmin) /
+      //          (xmax - xmin) * scr_size;
+      // int xh = (arf_get_d(u.first.hi.val, ARF_RND_NEAR) - xmin) /
+      //          (xmax - xmin) * scr_size;
+      // int yl = (arf_get_d(u.second.lo.val, ARF_RND_NEAR) - ymin) /
+      //          (ymax - ymin) * scr_size;
+      // int yh = (arf_get_d(u.second.hi.val, ARF_RND_NEAR) - ymin) /
+      //          (ymax - ymin) * scr_size;
+      varible x(u.x.first), y(u.x.second);
       auto val = p.eval(x, y);
       bool f = true;
       for (const auto &r : val.r) {
@@ -154,31 +189,43 @@ struct plotter {
       // cout << xl << ' ' << xh << ' ' << yl << ' ' << yh << endl;
       // cout << x << ' ' << y << " => " << val << " " << f << endl;
       if (f) {
-        for (int i = yl; i < yh; ++i)
-          for (int j = xl; j < xh; ++j) {
+        // for (int i = yl; i < yh; ++i)
+        //   for (int j = xl; j < xh; ++j) {
+        //     image[i * scr_size + j] = no;
+        //   }
+        for (int i = u.ll.second; i < u.hh.second; ++i)
+          for (int j = u.ll.first; j < u.hh.first; ++j)
             image[i * scr_size + j] = no;
-          }
       } else {
         fval xm, ym;
-        arf_add(xm.val, u.first.lo.val, u.first.hi.val, 128, ARF_RND_NEAR);
+        arf_add(xm.val, u.x.first.lo.val, u.x.first.hi.val, 128, ARF_RND_NEAR);
         arf_div_ui(xm.val, xm.val, 2, 128, ARF_RND_NEAR);
-        arf_add(ym.val, u.second.lo.val, u.second.hi.val, 128, ARF_RND_NEAR);
+        arf_add(ym.val, u.x.second.lo.val, u.x.second.hi.val, 128,
+                ARF_RND_NEAR);
         arf_div_ui(ym.val, ym.val, 2, 128, ARF_RND_NEAR);
         for (int i = 0; i < 4; ++i) {
-          U1.push_back(pair<range, range>());
+          U1.push_back(rect());
           if (i / 2) {
-            arf_set(U1.back().first.lo.val, u.first.lo.val);
-            arf_set(U1.back().first.hi.val, xm.val);
+            arf_set(U1.back().x.first.lo.val, u.x.first.lo.val);
+            arf_set(U1.back().x.first.hi.val, xm.val);
+            U1.back().ll.first = u.ll.first;
+            U1.back().hh.first = (u.ll.first + u.hh.first) / 2;
           } else {
-            arf_set(U1.back().first.lo.val, xm.val);
-            arf_set(U1.back().first.hi.val, u.first.hi.val);
+            arf_set(U1.back().x.first.lo.val, xm.val);
+            arf_set(U1.back().x.first.hi.val, u.x.first.hi.val);
+            U1.back().ll.first = (u.ll.first + u.hh.first) / 2;
+            U1.back().hh.first = u.hh.first;
           }
           if (i % 2) {
-            arf_set(U1.back().second.lo.val, u.second.lo.val);
-            arf_set(U1.back().second.hi.val, ym.val);
+            arf_set(U1.back().x.second.lo.val, u.x.second.lo.val);
+            arf_set(U1.back().x.second.hi.val, ym.val);
+            U1.back().ll.second = u.ll.second;
+            U1.back().hh.second = (u.ll.second + u.hh.second) / 2;
           } else {
-            arf_set(U1.back().second.lo.val, ym.val);
-            arf_set(U1.back().second.hi.val, u.second.hi.val);
+            arf_set(U1.back().x.second.lo.val, ym.val);
+            arf_set(U1.back().x.second.hi.val, u.x.second.hi.val);
+            U1.back().ll.second = (u.ll.second + u.hh.second) / 2;
+            U1.back().hh.second = u.hh.second;
           }
         }
       }
@@ -192,6 +239,9 @@ struct plotter {
         }
         swap(U, U1);
         U1.clear();
+        // cout << "sort" << endl;
+        sort(U.begin(), U.end(),
+             [](const rect a, const rect b) { return f(a.ll) < f(b.ll); });
         iter = U.begin();
       }
       if (iter == U.end()) {
@@ -202,15 +252,16 @@ struct plotter {
       const auto &u = *iter;
       // cout << state << ' ' << k << ' ' << iter - U.begin() << ' ' << U.size()
       //      << " " << U1.size() << endl;
-      int x0 = (arf_get_d(u.first.lo.val, ARF_RND_FLOOR) - xmin) /
-               (xmax - xmin) * scr_size;
-      int y0 = (arf_get_d(u.second.lo.val, ARF_RND_FLOOR) - ymin) /
-               (ymax - ymin) * scr_size;
+      // int x0 = (arf_get_d(u.first.lo.val, ARF_RND_FLOOR) - xmin) /
+      //          (xmax - xmin) * scr_size;
+      // int y0 = (arf_get_d(u.second.lo.val, ARF_RND_FLOOR) - ymin) /
+      //          (ymax - ymin) * scr_size;
+      int x0 = u.ll.first, y0 = u.ll.second;
       if (root_cnt[y0 * scr_size + x0] < 0) {
         iter++;
         return;
       }
-      varible x(u.first), y(u.second);
+      varible x(u.x.first), y(u.x.second);
       auto val = p.eval(x, y);
       bool f = true;
       for (const auto &r : val.r) {
@@ -232,10 +283,10 @@ struct plotter {
         hhx.r.push_back(range());
         lly.r.push_back(range());
         hhy.r.push_back(range());
-        llx.r[0].lo = llx.r[0].hi = u.first.lo;
-        hhx.r[0].lo = hhx.r[0].hi = u.first.hi;
-        lly.r[0].lo = lly.r[0].hi = u.second.lo;
-        hhy.r[0].lo = hhy.r[0].hi = u.second.hi;
+        llx.r[0].lo = llx.r[0].hi = u.x.first.lo;
+        hhx.r[0].lo = hhx.r[0].hi = u.x.first.hi;
+        lly.r[0].lo = lly.r[0].hi = u.x.second.lo;
+        hhy.r[0].lo = hhy.r[0].hi = u.x.second.hi;
         vector<pair<bool, bool>> sgns;
         for (int i = 0; i < 4; ++i) {
           auto val = p.eval((i / 2) ? llx : hhx, (i % 2) ? lly : hhy);
@@ -268,26 +319,30 @@ struct plotter {
         } else {
           root_cnt[y0 * scr_size + x0] += 4;
           fval xm, ym;
-          arf_add(xm.val, u.first.lo.val, u.first.hi.val, 128, ARF_RND_NEAR);
+          arf_add(xm.val, u.x.first.lo.val, u.x.first.hi.val, 128,
+                  ARF_RND_NEAR);
           arf_div_ui(xm.val, xm.val, 2, 128, ARF_RND_NEAR);
-          arf_add(ym.val, u.second.lo.val, u.second.hi.val, 128, ARF_RND_NEAR);
+          arf_add(ym.val, u.x.second.lo.val, u.x.second.hi.val, 128,
+                  ARF_RND_NEAR);
           arf_div_ui(ym.val, ym.val, 2, 128, ARF_RND_NEAR);
           for (int i = 0; i < 4; ++i) {
-            U1.push_back(pair<range, range>());
+            U1.push_back(rect());
             if (i / 2) {
-              arf_set(U1.back().first.lo.val, u.first.lo.val);
-              arf_set(U1.back().first.hi.val, xm.val);
+              arf_set(U1.back().x.first.lo.val, u.x.first.lo.val);
+              arf_set(U1.back().x.first.hi.val, xm.val);
             } else {
-              arf_set(U1.back().first.lo.val, xm.val);
-              arf_set(U1.back().first.hi.val, u.first.hi.val);
+              arf_set(U1.back().x.first.lo.val, xm.val);
+              arf_set(U1.back().x.first.hi.val, u.x.first.hi.val);
             }
             if (i % 2) {
-              arf_set(U1.back().second.lo.val, u.second.lo.val);
-              arf_set(U1.back().second.hi.val, ym.val);
+              arf_set(U1.back().x.second.lo.val, u.x.second.lo.val);
+              arf_set(U1.back().x.second.hi.val, ym.val);
             } else {
-              arf_set(U1.back().second.lo.val, ym.val);
-              arf_set(U1.back().second.hi.val, u.second.hi.val);
+              arf_set(U1.back().x.second.lo.val, ym.val);
+              arf_set(U1.back().x.second.hi.val, u.x.second.hi.val);
             }
+            U1.back().hh = u.hh;
+            U1.back().ll = u.ll;
           }
         }
       }
@@ -396,11 +451,12 @@ int main(int argc, char **argv) {
       auto t0 = chrono::steady_clock::now();
       // cout << i << ' ' << plot_pool[i].state << endl;
       for (; !quit;) {
+        this_thread::sleep_for(10us); // for faster response from console thread
         lock_guard lck(mtx);
         if (chrono::steady_clock::now() - t0 >= 30ms || i >= plot_pool.size()) {
           break;
         }
-        for (int t = 0; t < 10; ++t)
+        for (int t = 0; t < 1000; ++t)
           plot_pool.at(i).step();
       }
       i = (i + 1) % plot_pool.size();

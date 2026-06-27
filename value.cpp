@@ -31,6 +31,7 @@ bool fval::nan() const { return arf_is_nan(val); }
 bool fval::pinf() const { return arf_is_pos_inf(val); }
 bool fval::ninf() const { return arf_is_neg_inf(val); }
 
+range::~range() {}
 range neg(const range &x) {
   range res;
   arf_neg(res.lo.val, x.hi.val);

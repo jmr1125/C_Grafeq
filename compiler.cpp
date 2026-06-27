@@ -27,7 +27,11 @@ struct expr_tree {
   inst::opcode op; // ret ==> num,x,y
   std::shared_ptr<expr_tree> l, r;
   uint16_t hash;
-  int get_hash() {
+  bool ha = false;
+  int get_hash(int c = 0) {
+    if (ha)
+      return hash;
+    // std::cerr << c << ' ';
     bool can_swap = true;
     switch (op) {
     case inst::ret:
@@ -39,12 +43,13 @@ struct expr_tree {
     case inst::add:
     case inst::mul:
     case inst::uon: {
-      uint16_t L = l->get_hash() + 1, R = r->get_hash() + 1;
+      uint16_t L = l->get_hash(c + 1) + 1, R = r->get_hash(c + 1) + 1;
       if (L > R && can_swap) {
         swap(l, r);
-        return get_hash();
+        return get_hash(c + 1);
       }
       hash_append(hash, L, R, op);
+      ha = true;
       return hash;
     }
     case inst::neg:
@@ -56,8 +61,9 @@ struct expr_tree {
     case inst::flr:
     case inst::cil:
     case inst::qrt: {
-      uint16_t L = l->get_hash();
+      uint16_t L = l->get_hash(c + 1);
       hash_append(hash, L, op);
+      ha = true;
       return hash;
     }
     }
@@ -314,6 +320,7 @@ int main() {
             pop_one(op, num);
           }
           op.push(str2op.at(ss));
+          begin = true;
         }
       }
     }
@@ -341,6 +348,7 @@ int main() {
     }
   }
   while (!all_node.empty()) {
+    // cerr << all_node.size() << ' ' << flush;
     int i = 0;
     for (; i < all_node.size(); ++i) {
       bool f = false;
@@ -377,18 +385,19 @@ int main() {
         topo.push_back(all_node[i].first);
         break;
       }
-      if (f)
-        break;
-    }
-    for (int j = 0; j < all_node.size(); ++j) {
-      if (all_node[j].first->l == all_node[i].first) {
-        all_node[j].second.first = true;
+      if (f) {
+        for (int j = 0; j < all_node.size(); ++j) {
+          if (all_node[j].first->l == all_node[i].first) {
+            all_node[j].second.first = true;
+          }
+          if (all_node[j].first->r == all_node[i].first) {
+            all_node[j].second.second = true;
+          }
+        }
+        all_node.erase(all_node.begin() + i);
+        i--;
       }
-      if (all_node[j].first->r == all_node[i].first) {
-        all_node[j].second.second = true;
-      }
     }
-    all_node.erase(all_node.begin() + i);
   }
   int max_i = 2 + constants.size();
   vector<vector<pair<shared_ptr<expr_tree>, int>>> map(65536);
