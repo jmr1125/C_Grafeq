@@ -456,7 +456,7 @@ int main(int argc, char **argv) {
         if (chrono::steady_clock::now() - t0 >= 30ms || i >= plot_pool.size()) {
           break;
         }
-        for (int t = 0; t < 1000; ++t)
+        for (int t = 0; t < 100; ++t)
           plot_pool.at(i).step();
       }
       i = (i + 1) % plot_pool.size();

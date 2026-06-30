@@ -48,7 +48,7 @@ struct expr_tree {
         swap(l, r);
         return get_hash(c + 1);
       }
-      hash_append(hash, L, R, op);
+      hash_append(hash, L ^ R, op);
       ha = true;
       return hash;
     }
@@ -167,39 +167,29 @@ using namespace std;
 int main() {
   string expr;
   getline(cin, expr);
-  const regex number(R"((-?[0-9]+(?:\.[0-9]+)?)(?:e(-?[0-9]+))?.*)");
-  const regex token(
-      R"(([xy+*/(),-]|(?:pow|union|sin|cos|tan|exp|log|floor|ceil|sqrt)).*$)");
+  const string rnum = R"((?:(?:-?[0-9]+(?:\.[0-9]+)?)(?:e(?:-?[0-9]+))?)|[xy])";
+  const string roper =
+      R"((?:[+*/(),-]|(?:pow|union|sin|cos|tan|exp|log|floor|ceil|sqrt)))";
+  const regex number(rnum);
+  const regex token(rnum + "|" + roper);
   vector<pair<bool, string>> tokens;
   vector<string> constants;
   int i = 0;
-  while (i < expr.size()) {
-    match_results<string::const_iterator> res;
-    if (regex_match(expr.cbegin() + i, expr.cend(), res, token)) {
-      // cout << "tok: " << res[1].str() << endl;
-      if (res[1].str() == "x" || res[1].str() == "y") {
-        tokens.push_back({true, res[1].str()});
-      } else {
-        tokens.push_back({false, res[1].str()});
+  cerr << "token.." << endl;
+  for (smatch sm; regex_search(expr, sm, token); expr = sm.suffix()) {
+    string tok = sm.str();
+    if (regex_match(tok, number)) {
+      if (tok == "x" || tok == "y")
+        tokens.push_back({true, tok});
+      else {
+        tokens.push_back({true, tok});
+        constants.push_back(tok);
       }
-      i += res[1].str().size();
-    } else if (regex_match(expr.cbegin() + i, expr.cend(), res, number)) {
-      // cout << "num: " << res[1].str() << endl;
-      tokens.push_back({true, res[1].str()});
-      try {
-        constants.push_back(res[1].str());
-      } catch (const exception &e) {
-        cout << e.what() << endl;
-        return 1;
-      }
-      i += res[1].str().size();
     } else {
-      cerr << expr << endl;
-      cerr << string(i, ' ') << "^" << endl;
-      cerr << "syntax error at: " << i << endl;
-      return 1;
+      tokens.push_back({false, tok});
     }
   }
+  cerr << "build tree" << endl;
   sort(constants.begin(), constants.end());
   constants.erase(unique(constants.begin(), constants.end()), constants.end());
   const int prio[256] = {
@@ -335,8 +325,10 @@ int main() {
     cerr << "excessive value!" << endl;
     return 1;
   }
+  cerr << "hash" << endl;
   num.top()->get_hash();
   // num.top()->show();
+  cerr << "topo" << endl;
   stack<shared_ptr<expr_tree>> stk;
   vector<pair<shared_ptr<expr_tree>, pair<bool, bool>>> all_node;
   vector<shared_ptr<expr_tree>> topo;
@@ -423,6 +415,7 @@ int main() {
   for (const auto &x : constants)
     cout << x << ' ';
   cout << endl;
+  cerr << "asm" << endl;
   for (const auto &t : topo) {
     // cerr << t << endl;
     if (t->op == inst::ret) {
